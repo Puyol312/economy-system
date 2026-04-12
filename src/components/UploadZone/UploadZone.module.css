@@ -1,0 +1,154 @@
+.wrapper {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* ── Zona de drop ── */
+.zone {
+  width: 100%;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 48px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  background: var(--background);
+  transition: border-color 0.15s, background 0.15s;
+  outline: none;
+}
+
+.zone:hover,
+.zone:focus-visible {
+  border-color: var(--text-secondary);
+  background: var(--surface);
+}
+
+.zone.dragging {
+  border-color: #1d9e75;
+  background: #f0faf6;
+}
+
+.hiddenInput {
+  display: none;
+}
+
+.uploadIcon {
+  color: var(--text-tertiary);
+  margin-bottom: 4px;
+}
+
+.zone.dragging .uploadIcon {
+  color: #1d9e75;
+}
+
+.dropText {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.dropSubtext {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.formatBadge {
+  margin-top: 8px;
+  font-size: 11px;
+  font-family: monospace;
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  color: var(--text-secondary);
+}
+
+/* ── Loading ── */
+.spinner {
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--border);
+  border-top-color: #1d9e75;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  margin-bottom: 4px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loadingText {
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* ── Archivo cargado ── */
+.fileLoaded {
+  width: 100%;
+  max-width: 440px;
+  background: var(--background);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.fileIcon {
+  color: #1d9e75;
+  flex-shrink: 0;
+}
+
+.fileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.fileName {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fileStatus {
+  font-size: 12px;
+  color: #1d9e75;
+  margin-top: 2px;
+}
+
+.removeButton {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: none;
+  border: 0.5px solid var(--border);
+  border-radius: 6px;
+  padding: 5px 10px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.removeButton:hover {
+  color: #d85a30;
+  border-color: #d85a30;
+}
+
+/* ── Error ── */
+.error {
+  font-size: 12px;
+  color: #d85a30;
+  padding-left: 4px;
+}

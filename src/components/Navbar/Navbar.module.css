@@ -1,0 +1,56 @@
+.topbar {
+  background: var(--background);
+  border-bottom: 0.5px solid var(--border);
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.logo {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.logoDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #1d9e75;
+  display: inline-block;
+}
+
+.nav {
+  display: flex;
+  gap: 4px;
+}
+
+.navLink {
+  font-size: 13px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  border: 0.5px solid transparent;
+  transition: background 0.15s, color 0.15s;
+}
+
+.navLink:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.navLink.active {
+  background: var(--surface);
+  color: var(--text-primary);
+  border-color: var(--border);
+  font-weight: 500;
+}
