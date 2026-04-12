@@ -1,0 +1,109 @@
+.sidebar {
+  background: var(--background);
+  border-right: 0.5px solid var(--border);
+  padding: 24px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 180px;
+}
+
+.sidebarTitle {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding-left: 8px;
+}
+
+/* ── Lista desktop ── */
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.item {
+  width: 100%;
+  text-align: left;
+  font-size: 13px;
+  color: var(--text-secondary);
+  background: none;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.item:hover {
+  background: var(--surface);
+  color: var(--text-primary);
+}
+
+.item.active {
+  background: var(--surface);
+  color: var(--text-primary);
+  font-weight: 500;
+  border-left: 2px solid #1d9e75;
+  border-radius: 0 8px 8px 0;
+  padding-left: 8px;
+}
+
+/* ── Selector mobile — oculto en desktop ── */
+.mobileScroll {
+  display: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar {
+    border-right: none;
+    border-bottom: 0.5px solid var(--border);
+    padding: 12px 16px;
+    min-width: unset;
+  }
+
+  .list {
+    display: none;
+  }
+
+  .mobileScroll {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: none;
+  }
+
+  .mobileScroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .mobileItem {
+    white-space: nowrap;
+    font-size: 13px;
+    color: var(--text-secondary);
+    background: var(--surface);
+    border: 0.5px solid var(--border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+
+  .mobileItem:hover {
+    color: var(--text-primary);
+    border-color: var(--text-secondary);
+  }
+
+  .mobileItem.mobileActive {
+    background: #1d9e7515;
+    color: #1d9e75;
+    border-color: #1d9e75;
+    font-weight: 500;
+  }
+}

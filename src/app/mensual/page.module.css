@@ -1,0 +1,62 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 52px);
+}
+
+/* ── Layout principal: sidebar + contenido ── */
+.layout {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  align-items: start;
+}
+
+/* ── Contenido principal ── */
+.content {
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+/* ── Grid de gráficos ── */
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.chartMain {
+  min-height: 320px;
+}
+
+.chartSide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartMain {
+    min-height: 260px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+
+  .content {
+    padding: 16px;
+    gap: 16px;
+  }
+}
