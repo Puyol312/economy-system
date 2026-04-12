@@ -1,0 +1,51 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 52px);
+}
+
+.content {
+  flex: 1;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ── Grid de gráficos ── */
+.chartsGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Panel izquierdo */
+.chartMain {
+  min-height: 340px;
+}
+
+/* Panel derecho — dos gráficos apilados */
+.chartSide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Responsive ── */
+@media (max-width: 900px) {
+  .chartsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chartMain {
+    min-height: 280px;
+  }
+}
+
+@media (max-width: 640px) {
+  .content {
+    padding: 16px;
+    gap: 16px;
+  }
+}
