@@ -45,7 +45,6 @@ export const calcularBalancePorMes = (
       movimientosPorMes[mes] = [];
     }
 
-    console.log("dia original:", mov.dia, "→ mes calculado:", mes);
     movimientosPorMes[mes].push(mov);
   }
 
