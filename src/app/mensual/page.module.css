@@ -53,6 +53,8 @@
 @media (max-width: 768px) {
   .layout {
     grid-template-columns: 1fr;
+    overflow: hidden;
+    width: 100%;
   }
 
   .content {
