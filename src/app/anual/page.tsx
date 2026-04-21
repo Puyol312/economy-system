@@ -13,35 +13,32 @@ import styles from "./page.module.css";
 /**
  * AnualPage — `/anual`
  *
- * Página de reporte anual. Consulta los cálculos al endpoint
- * `/api/reportes/anual` pasando la hoja activa del context.
- *
- * La página gestiona tres estados:
- * - Sin datos: muestra `EmptyState`.
- * - Cargando: muestra un skeleton.
- * - Con datos: renderiza los gráficos y el resumen.
- *
- * Es un Client Component porque consume el context y gestiona
- * el estado del fetch con `useState` y `useEffect`.
+ * Página de reporte anual. Manda los movimientos de la hoja activa
+ * al endpoint POST /api/reportes/anual y renderiza los resultados.
  */
 export default function AnualPage() {
-  const { hojaActiva } = useExcel();
+  const { hojaActiva, movimientosPorHoja } = useExcel();
 
-  const [reporte, setReporte]   = useState<ReporteAnualResponse | null>(null);
+  const [reporte, setReporte]     = useState<ReporteAnualResponse | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
 
   useEffect(() => {
-    if (!hojaActiva) return;
+    if (!hojaActiva || !movimientosPorHoja) return;
+
+    const movimientos = movimientosPorHoja[hojaActiva];
+    if (!movimientos) return;
 
     const fetchReporte = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        const res = await fetch(
-          `/api/reportes/anual?hoja=${encodeURIComponent(hojaActiva)}`
-        );
+        const res = await fetch("/api/reportes/anual", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ movimientos }),
+        });
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
@@ -58,9 +55,8 @@ export default function AnualPage() {
     };
 
     fetchReporte();
-  }, [hojaActiva]);
+  }, [hojaActiva, movimientosPorHoja]);
 
-  // ── Sin archivo cargado ───────────────────────────────────────
   if (!hojaActiva) {
     return (
       <EmptyState
@@ -72,7 +68,6 @@ export default function AnualPage() {
     );
   }
 
-  // ── Error ─────────────────────────────────────────────────────
   if (error) {
     return (
       <EmptyState
@@ -84,7 +79,6 @@ export default function AnualPage() {
     );
   }
 
-  // ── Loading ───────────────────────────────────────────────────
   if (isLoading || !reporte) {
     return (
       <div className={styles.page}>
@@ -107,13 +101,10 @@ export default function AnualPage() {
     );
   }
 
-  // ── Con datos ─────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <PageHeader title="Reporte anual" breadcrumb="Reportes" />
-
       <div className={styles.content}>
-        {/* ── Gráficos ── */}
         <div className={styles.chartsGrid}>
           <div className={styles.chartMain}>
             <BalanceAnualChart balancePorMes={reporte.balancePorMes} />
@@ -123,8 +114,6 @@ export default function AnualPage() {
             <TotalesPorMesChart totalesPorMes={reporte.debitosPorMes}  tipo="debito" />
           </div>
         </div>
-
-        {/* ── Resumen ── */}
         <ResumenAnual
           totalCreditos={reporte.totalCreditos}
           totalDebitos={reporte.totalDebitos}

@@ -15,16 +15,11 @@ import styles from "./page.module.css";
 /**
  * MensualPage — `/mensual`
  *
- * Página de reporte mensual. Consulta `/api/reportes/mensual`
- * pasando la hoja activa y el mes seleccionado.
- *
- * En el primer fetch no se manda `mes`, el endpoint resuelve
- * automáticamente el primero disponible y lo devuelve en `reporte.mes`.
- * A partir de ahí el estado local `mesActivo` se sincroniza con
- * lo que devuelve la API.
+ * Página de reporte mensual. Manda los movimientos de la hoja activa
+ * al endpoint POST /api/reportes/mensual junto con el mes seleccionado.
  */
 export default function MensualPage() {
-  const { hojaActiva } = useExcel();
+  const { hojaActiva, movimientosPorHoja } = useExcel();
 
   const [reporte, setReporte]     = useState<ReporteMensualResponse | null>(null);
   const [mesActivo, setMesActivo] = useState<string | null>(null);
@@ -32,19 +27,24 @@ export default function MensualPage() {
   const [error, setError]         = useState<string | null>(null);
 
   useEffect(() => {
-    if (!hojaActiva) return;
+    if (!hojaActiva || !movimientosPorHoja) return;
+
+    const movimientos = movimientosPorHoja[hojaActiva];
+    if (!movimientos) return;
 
     const fetchReporte = async () => {
       setIsLoading(true);
       setError(null);
 
       try {
-        // Si no hay mes activo aún, no mandamos el parámetro
-        // y el endpoint resuelve el primero disponible
-        const mesQuery = mesActivo ? `&mes=${encodeURIComponent(mesActivo)}` : "";
-        const res = await fetch(
-          `/api/reportes/mensual?hoja=${encodeURIComponent(hojaActiva)}${mesQuery}`
-        );
+        const res = await fetch("/api/reportes/mensual", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            movimientos,
+            ...(mesActivo ? { mes: mesActivo } : {}),
+          }),
+        });
 
         if (!res.ok) {
           const body = await res.json().catch(() => ({}));
@@ -52,8 +52,6 @@ export default function MensualPage() {
         }
 
         const data: ReporteMensualResponse = await res.json();
-
-        // Sincronizamos el mes activo con lo que resolvió la API
         setMesActivo(data.mes);
         setReporte(data);
       } catch (err) {
@@ -64,9 +62,8 @@ export default function MensualPage() {
     };
 
     fetchReporte();
-  }, [hojaActiva, mesActivo]);
+  }, [hojaActiva, movimientosPorHoja, mesActivo]);
 
-  // ── Sin archivo cargado ───────────────────────────────────────
   if (!hojaActiva) {
     return (
       <EmptyState
@@ -78,7 +75,6 @@ export default function MensualPage() {
     );
   }
 
-  // ── Error ─────────────────────────────────────────────────────
   if (error) {
     return (
       <EmptyState
@@ -90,7 +86,6 @@ export default function MensualPage() {
     );
   }
 
-  // ── Loading ───────────────────────────────────────────────────
   if (isLoading || !reporte || !mesActivo) {
     return (
       <div className={styles.page}>
@@ -117,18 +112,15 @@ export default function MensualPage() {
     );
   }
 
-  // ── Con datos ─────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <PageHeader title="Reporte mensual" breadcrumb="Reportes" />
-
       <div className={styles.layout}>
         <MesesSidebar
           meses={reporte.meses}
           mesActivo={mesActivo}
           onMesChange={setMesActivo}
         />
-
         <div className={styles.content}>
           <div className={styles.chartsGrid}>
             <div className={styles.chartMain}>
@@ -139,13 +131,11 @@ export default function MensualPage() {
               <TotalesPorDiaChart totalesPorDia={reporte.debitosPorDia}  tipo="debito" />
             </div>
           </div>
-
           <ResumenMensual
             totalCreditos={reporte.totalCreditos}
             totalDebitos={reporte.totalDebitos}
             balanceMes={reporte.balanceMes}
           />
-
           <ConceptosTable
             creditos={reporte.creditos}
             debitos={reporte.debitos}

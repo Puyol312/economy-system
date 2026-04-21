@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseExcel } from "@/lib/exel/parseExcel";
-import { setMovimientos, clearStore } from "@/lib/store/movimientosStore";
 
 /** Tamaño máximo permitido: 10 MB */
 const MAX_SIZE = 10 * 1024 * 1024;
@@ -9,16 +8,17 @@ const MAX_SIZE = 10 * 1024 * 1024;
  * POST /api/upload
  *
  * Recibe un archivo `.xlsx` via `multipart/form-data`, parsea todas
- * sus hojas, guarda los movimientos en el store del servidor y
- * devuelve los nombres de las hojas detectadas.
+ * sus hojas y devuelve las hojas detectadas junto con los movimientos
+ * normalizados por hoja.
  *
- * El cliente ya no recibe los movimientos directamente, solo
- * la lista de hojas disponibles para mostrar en la homepage.
+ * Los movimientos se devuelven al cliente y se almacenan en el
+ * ExcelContext. Las páginas los mandan en el body de cada request
+ * a los endpoints de reportes, sin necesidad de estado en el servidor.
  *
  * El campo del FormData debe llamarse `file`.
  *
  * Respuestas:
- * - `200` → `{ hojas: string[] }`
+ * - `200` → `{ hojas: string[], movimientosPorHoja: Record<string, Movimiento[]> }`
  * - `400` → `{ message: string }` si falta el archivo, formato incorrecto o supera el tamaño.
  * - `500` → `{ message: string }` si el parseo falla inesperadamente.
  *
@@ -27,8 +27,7 @@ const MAX_SIZE = 10 * 1024 * 1024;
  * formData.append("file", file);
  *
  * const res = await fetch("/api/upload", { method: "POST", body: formData });
- * const { hojas } = await res.json();
- * // hojas → ["Cuenta Corriente", "Caja de Ahorro"]
+ * const { hojas, movimientosPorHoja } = await res.json();
  */
 export async function POST(req: NextRequest) {
   let formData: FormData;
@@ -66,20 +65,13 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  // ── Parseo y guardado en store ────────────────────────────────
+  // ── Parseo ────────────────────────────────────────────────────
   try {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const { hojas, movimientosPorHoja } = parseExcel(buffer);
 
-    // Limpia el store antes de cargar el nuevo archivo
-    clearStore();
-
-    for (const hoja of hojas) {
-      setMovimientos(hoja, movimientosPorHoja[hoja]);
-    }
-
-    return NextResponse.json({ hojas });
+    return NextResponse.json({ hojas, movimientosPorHoja });
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Error al procesar el archivo.";

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMovimientos } from "@/lib/store/movimientosStore";
+import type { Movimiento } from "@/types";
 import {
   calcularBalancePorMes,
   obtenerTotalesPorMes,
@@ -10,8 +10,6 @@ import {
  * ReporteAnualResponse
  *
  * Estructura del JSON que devuelve este endpoint.
- * La página `/anual` lo consume directamente para alimentar
- * los gráficos y las tarjetas de resumen.
  */
 export interface ReporteAnualResponse {
   balancePorMes:  Record<string, number>;
@@ -24,43 +22,47 @@ export interface ReporteAnualResponse {
 }
 
 /**
- * GET /api/reportes/anual?hoja=Cuenta Corriente
+ * POST /api/reportes/anual
  *
- * Lee los movimientos de la hoja indicada desde el store del servidor,
- * aplica los controladores y devuelve todos los cálculos necesarios
- * para renderizar la página `/anual`.
+ * Recibe los movimientos de una hoja en el body, aplica los
+ * controladores y devuelve todos los cálculos necesarios para
+ * renderizar la página `/anual`.
  *
- * Query params:
- * - `hoja` (requerido): nombre de la hoja del Excel a consultar.
+ * Los movimientos vienen del ExcelContext en el cliente,
+ * sin necesidad de estado en el servidor.
+ *
+ * Body: `{ movimientos: Movimiento[] }`
  *
  * Respuestas:
  * - `200` → `ReporteAnualResponse`
- * - `400` → `{ message: string }` si falta el parámetro `hoja`.
- * - `404` → `{ message: string }` si la hoja no existe en el store.
+ * - `400` → `{ message: string }` si falta el body o los movimientos.
  *
  * @example
- * const res = await fetch("/api/reportes/anual?hoja=Cuenta Corriente");
+ * const res = await fetch("/api/reportes/anual", {
+ *   method: "POST",
+ *   headers: { "Content-Type": "application/json" },
+ *   body: JSON.stringify({ movimientos }),
+ * });
  * const reporte = await res.json();
  */
-export async function GET(req: NextRequest) {
-  const hoja = req.nextUrl.searchParams.get("hoja");
+export async function POST(req: NextRequest) {
+  let body: { movimientos?: Movimiento[] };
 
-  if (!hoja) {
+  try {
+    body = await req.json();
+  } catch {
     return NextResponse.json(
-      { message: "El parámetro 'hoja' es requerido." },
+      { message: "El cuerpo de la solicitud no es válido." },
       { status: 400 }
     );
   }
 
-  const movimientos = getMovimientos(hoja);
+  const { movimientos } = body;
 
-  console.log("Total movimientos:", movimientos?.length);
-  console.log("Muestra dias:", movimientos?.map(m => m.dia));
-
-  if (!movimientos) {
+  if (!movimientos || !Array.isArray(movimientos)) {
     return NextResponse.json(
-      { message: `No se encontraron datos para la hoja "${hoja}". Subí el archivo primero.` },
-      { status: 404 }
+      { message: "El campo 'movimientos' es requerido." },
+      { status: 400 }
     );
   }
 

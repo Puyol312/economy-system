@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getMovimientos } from "@/lib/store/movimientosStore";
+import type { Movimiento } from "@/types";
 import {
   calcularBalance,
   calcularBalancePorDia,
@@ -13,13 +13,9 @@ import { agruparPorConcepto } from "@/controllers/SingleMonthController";
  * ReporteMensualResponse
  *
  * Estructura del JSON que devuelve este endpoint.
- * La página `/mensual` lo consume directamente para alimentar
- * los gráficos, las tarjetas de resumen y la tabla de conceptos.
  */
 export interface ReporteMensualResponse {
-  /** Lista de meses disponibles en la hoja, en formato "YYYY-MM" ordenados. */
   meses:          string[];
-  /** Mes que se está devolviendo en esta respuesta. */
   mes:            string;
   balancePorDia:  Record<string, number>;
   creditosPorDia: Record<string, number>;
@@ -32,50 +28,47 @@ export interface ReporteMensualResponse {
 }
 
 /**
- * GET /api/reportes/mensual?hoja=Cuenta Corriente&mes=2026-04
+ * POST /api/reportes/mensual
  *
- * Lee los movimientos de la hoja indicada desde el store del servidor,
- * filtra por el mes solicitado y aplica los controladores para devolver
- * todos los cálculos necesarios para renderizar la página `/mensual`.
+ * Recibe los movimientos de una hoja y el mes a analizar en el body,
+ * aplica los controladores y devuelve todos los cálculos necesarios
+ * para renderizar la página `/mensual`.
  *
- * Si `mes` no se provee o no existe en los datos, usa el primer mes
- * disponible automáticamente.
+ * Si `mes` no se provee o no existe, usa el primer mes disponible.
  *
- * Query params:
- * - `hoja` (requerido): nombre de la hoja del Excel a consultar.
- * - `mes`  (opcional): mes a analizar en formato "YYYY-MM".
- *                      Si se omite, usa el primer mes disponible.
+ * Body: `{ movimientos: Movimiento[], mes?: string }`
  *
  * Respuestas:
  * - `200` → `ReporteMensualResponse`
- * - `400` → `{ message: string }` si falta el parámetro `hoja`.
- * - `404` → `{ message: string }` si la hoja no existe en el store.
+ * - `400` → `{ message: string }` si falta el body o los movimientos.
  * - `404` → `{ message: string }` si no hay meses disponibles.
  *
  * @example
- * // Con mes específico
- * const res = await fetch("/api/reportes/mensual?hoja=Cuenta Corriente&mes=2026-04");
- *
- * // Sin mes — devuelve el primero disponible
- * const res = await fetch("/api/reportes/mensual?hoja=Cuenta Corriente");
+ * const res = await fetch("/api/reportes/mensual", {
+ *   method: "POST",
+ *   headers: { "Content-Type": "application/json" },
+ *   body: JSON.stringify({ movimientos, mes: "2026-04" }),
+ * });
+ * const reporte = await res.json();
  */
-export async function GET(req: NextRequest) {
-  const hoja = req.nextUrl.searchParams.get("hoja");
-  const mesParam = req.nextUrl.searchParams.get("mes");
+export async function POST(req: NextRequest) {
+  let body: { movimientos?: Movimiento[]; mes?: string };
 
-  if (!hoja) {
+  try {
+    body = await req.json();
+  } catch {
     return NextResponse.json(
-      { message: "El parámetro 'hoja' es requerido." },
+      { message: "El cuerpo de la solicitud no es válido." },
       { status: 400 }
     );
   }
 
-  const movimientos = getMovimientos(hoja);
+  const { movimientos, mes: mesParam } = body;
 
-  if (!movimientos) {
+  if (!movimientos || !Array.isArray(movimientos)) {
     return NextResponse.json(
-      { message: `No se encontraron datos para la hoja "${hoja}". Subí el archivo primero.` },
-      { status: 404 }
+      { message: "El campo 'movimientos' es requerido." },
+      { status: 400 }
     );
   }
 
@@ -90,7 +83,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  // Si no se provee mes o el mes no existe en los datos, usar el primero
   const mes = mesParam && movimientosPorMes[mesParam] ? mesParam : meses[0];
 
   // ── Cálculos del mes ──────────────────────────────────────────

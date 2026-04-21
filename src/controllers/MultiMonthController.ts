@@ -86,10 +86,8 @@ export const obtenerTotalesPorMes = (
   const movimientosPorMes: Record<string, Movimiento[]> = {};
 
   for (const mov of movimientos) {
-    const fecha = new Date(mov.dia);
-    const mes = `${fecha.getFullYear()}-${String(
-      fecha.getMonth() + 1
-    ).padStart(2, "0")}`;
+    const [anio, mm] = mov.dia.split("-");
+    const mes = `${anio}-${mm}`;
 
     if (!movimientosPorMes[mes]) {
       movimientosPorMes[mes] = [];
@@ -191,11 +189,8 @@ export const agruparMovimientosPorMes = (
   movimientos: Movimiento[]
 ): Record<string, Movimiento[]> => {
   return movimientos.reduce((acc, mov) => {
-    const fecha = new Date(mov.dia);
-
-    const mes = `${fecha.getFullYear()}-${String(
-      fecha.getMonth() + 1
-    ).padStart(2, "0")}`;
+    const [anio, mm] = mov.dia.split("-");
+    const mes = `${anio}-${mm}`;
 
     if (!acc[mes]) {
       acc[mes] = [];
