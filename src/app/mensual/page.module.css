@@ -60,3 +60,66 @@
     gap: 16px;
   }
 }
+
+/* ── Skeleton ── */
+@keyframes shimmer {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.skeletonSidebar {
+  background: var(--background);
+  border-right: 0.5px solid var(--border);
+  min-width: 200px;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.skeletonSide {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.skeletonBlock {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  animation: shimmer 1.5s ease-in-out infinite;
+  min-height: 120px;
+}
+
+.skeletonMain {
+  min-height: 320px;
+}
+
+.skeletonResumen {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.skeletonResumen .skeletonBlock {
+  min-height: 80px;
+}
+
+.skeletonTable {
+  min-height: 200px;
+}
+
+@media (max-width: 900px) {
+  .skeleton {
+    grid-template-columns: 1fr;
+  }
+
+  .skeletonResumen {
+    grid-template-columns: 1fr;
+  }
+}

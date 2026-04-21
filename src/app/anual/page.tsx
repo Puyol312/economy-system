@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useExcel } from "@/context/ExcelContext";
-import { calcularBalancePorMes, obtenerTotalesPorMes, obtenerAcumulado } from "@/controllers/MultiMonthController";
+import type { ReporteAnualResponse } from "@/app/api/reportes/anual/route";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import BalanceAnualChart from "./components/BalanceAnualChart";
@@ -13,35 +13,55 @@ import styles from "./page.module.css";
 /**
  * AnualPage — `/anual`
  *
- * Página de reporte anual. Consume los movimientos del `ExcelContext`
- * y los procesa con el `MultiMonthController` para mostrar:
+ * Página de reporte anual. Consulta los cálculos al endpoint
+ * `/api/reportes/anual` pasando la hoja activa del context.
  *
- * - Gráfico de barras: balance neto por mes (panel izquierdo).
- * - Gráficos de área: créditos y débitos por mes (panel derecho, apilados).
- * - Tarjetas de resumen: totales anuales y mejor mes (parte inferior).
+ * La página gestiona tres estados:
+ * - Sin datos: muestra `EmptyState`.
+ * - Cargando: muestra un skeleton.
+ * - Con datos: renderiza los gráficos y el resumen.
  *
- * Si no hay datos cargados muestra un `EmptyState` con un botón
- * para volver a Home a subir el archivo.
- *
- * Es un Client Component porque consume el context y usa `useMemo`.
+ * Es un Client Component porque consume el context y gestiona
+ * el estado del fetch con `useState` y `useEffect`.
  */
 export default function AnualPage() {
-  const { data } = useExcel();
+  const { hojaActiva } = useExcel();
 
-  const balancePorMes  = useMemo(() => data ? calcularBalancePorMes(data) : {}, [data]);
-  const creditosPorMes = useMemo(() => data ? obtenerTotalesPorMes(data, "credito") : {}, [data]);
-  const debitosPorMes  = useMemo(() => data ? obtenerTotalesPorMes(data, "debito") : {}, [data]);
+  const [reporte, setReporte]   = useState<ReporteAnualResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
 
-  const totalCreditos  = useMemo(() => obtenerAcumulado(creditosPorMes), [creditosPorMes]);
-  const totalDebitos   = useMemo(() => obtenerAcumulado(debitosPorMes), [debitosPorMes]);
-  const balanceAnual   = useMemo(() => obtenerAcumulado(balancePorMes), [balancePorMes]);
+  useEffect(() => {
+    if (!hojaActiva) return;
 
-  const mejorMes = useMemo(
-    () => Object.entries(balancePorMes).sort(([, a], [, b]) => b - a)[0]?.[0] ?? "",
-    [balancePorMes]
-  );
+    const fetchReporte = async () => {
+      setIsLoading(true);
+      setError(null);
 
-  if (!data) {
+      try {
+        const res = await fetch(
+          `/api/reportes/anual?hoja=${encodeURIComponent(hojaActiva)}`
+        );
+
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.message ?? "Error al obtener el reporte.");
+        }
+
+        const data: ReporteAnualResponse = await res.json();
+        setReporte(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchReporte();
+  }, [hojaActiva]);
+
+  // ── Sin archivo cargado ───────────────────────────────────────
+  if (!hojaActiva) {
     return (
       <EmptyState
         title="Sin datos cargados"
@@ -52,6 +72,42 @@ export default function AnualPage() {
     );
   }
 
+  // ── Error ─────────────────────────────────────────────────────
+  if (error) {
+    return (
+      <EmptyState
+        title="Error al cargar el reporte"
+        description={error}
+        href="/"
+        buttonLabel="Volver al inicio"
+      />
+    );
+  }
+
+  // ── Loading ───────────────────────────────────────────────────
+  if (isLoading || !reporte) {
+    return (
+      <div className={styles.page}>
+        <PageHeader title="Reporte anual" breadcrumb="Reportes" />
+        <div className={styles.content}>
+          <div className={styles.skeleton}>
+            <div className={`${styles.skeletonBlock} ${styles.skeletonMain}`} />
+            <div className={styles.skeletonSide}>
+              <div className={styles.skeletonBlock} />
+              <div className={styles.skeletonBlock} />
+            </div>
+          </div>
+          <div className={styles.skeletonResumen}>
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div key={i} className={styles.skeletonBlock} />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Con datos ─────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <PageHeader title="Reporte anual" breadcrumb="Reportes" />
@@ -59,24 +115,21 @@ export default function AnualPage() {
       <div className={styles.content}>
         {/* ── Gráficos ── */}
         <div className={styles.chartsGrid}>
-          {/* Panel izquierdo — balance por mes */}
           <div className={styles.chartMain}>
-            <BalanceAnualChart balancePorMes={balancePorMes} />
+            <BalanceAnualChart balancePorMes={reporte.balancePorMes} />
           </div>
-
-          {/* Panel derecho — créditos y débitos apilados */}
           <div className={styles.chartSide}>
-            <TotalesPorMesChart totalesPorMes={creditosPorMes} tipo="credito" />
-            <TotalesPorMesChart totalesPorMes={debitosPorMes}  tipo="debito" />
+            <TotalesPorMesChart totalesPorMes={reporte.creditosPorMes} tipo="credito" />
+            <TotalesPorMesChart totalesPorMes={reporte.debitosPorMes}  tipo="debito" />
           </div>
         </div>
 
         {/* ── Resumen ── */}
         <ResumenAnual
-          totalCreditos={totalCreditos}
-          totalDebitos={totalDebitos}
-          balanceAnual={balanceAnual}
-          mejorMes={mejorMes}
+          totalCreditos={reporte.totalCreditos}
+          totalDebitos={reporte.totalDebitos}
+          balanceAnual={reporte.balanceAnual}
+          mejorMes={reporte.mejorMes}
         />
       </div>
     </div>

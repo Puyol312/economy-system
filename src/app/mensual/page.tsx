@@ -1,10 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useExcel } from "@/context/ExcelContext";
-import { calcularBalance, calcularBalancePorDia, obtenerTotalesPorDia, sumarTotales } from "@/controllers/SingleMonthController";
-import { agruparMovimientosPorMes } from "@/controllers/MultiMonthController";
-import { agruparPorConcepto } from "@/controllers/SingleMonthController";
+import type { ReporteMensualResponse } from "@/app/api/reportes/mensual/route";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import MesesSidebar from "./components/MesesSidebar";
@@ -17,58 +15,59 @@ import styles from "./page.module.css";
 /**
  * MensualPage — `/mensual`
  *
- * Página de reporte mensual. Consume los movimientos del `ExcelContext`
- * y los procesa con los controladores para mostrar el análisis
- * del mes seleccionado en el sidebar.
+ * Página de reporte mensual. Consulta `/api/reportes/mensual`
+ * pasando la hoja activa y el mes seleccionado.
  *
- * Estructura:
- * - Sidebar izquierdo: lista de meses disponibles.
- * - Panel principal:
- *   - Gráfico de balance diario (principal).
- *   - Gráficos de créditos y débitos por día (secundarios).
- *   - Tarjetas de resumen del mes.
- *   - Tabla de conceptos agrupados.
- *
- * Si no hay datos cargados muestra un `EmptyState`.
- *
- * Es un Client Component porque consume el context y gestiona
- * el mes activo con `useState`.
+ * En el primer fetch no se manda `mes`, el endpoint resuelve
+ * automáticamente el primero disponible y lo devuelve en `reporte.mes`.
+ * A partir de ahí el estado local `mesActivo` se sincroniza con
+ * lo que devuelve la API.
  */
 export default function MensualPage() {
-  const { data } = useExcel();
+  const { hojaActiva } = useExcel();
 
-  // ── Meses disponibles ─────────────────────────────────────────
-  const movimientosPorMes = useMemo(
-    () => (data ? agruparMovimientosPorMes(data) : {}),
-    [data]
-  );
+  const [reporte, setReporte]     = useState<ReporteMensualResponse | null>(null);
+  const [mesActivo, setMesActivo] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError]         = useState<string | null>(null);
 
-  const meses = useMemo(
-    () => Object.keys(movimientosPorMes).sort(),
-    [movimientosPorMes]
-  );
+  useEffect(() => {
+    if (!hojaActiva) return;
 
-  const [mesActivo, setMesActivo] = useState<string>(() => meses[0] ?? "");
+    const fetchReporte = async () => {
+      setIsLoading(true);
+      setError(null);
 
-  // ── Movimientos del mes seleccionado ──────────────────────────
-  const movimientosMes = useMemo(
-    () => movimientosPorMes[mesActivo] ?? [],
-    [movimientosPorMes, mesActivo]
-  );
+      try {
+        // Si no hay mes activo aún, no mandamos el parámetro
+        // y el endpoint resuelve el primero disponible
+        const mesQuery = mesActivo ? `&mes=${encodeURIComponent(mesActivo)}` : "";
+        const res = await fetch(
+          `/api/reportes/mensual?hoja=${encodeURIComponent(hojaActiva)}${mesQuery}`
+        );
 
-  // ── Cálculos del mes ──────────────────────────────────────────
-  const balancePorDia  = useMemo(() => calcularBalancePorDia(movimientosMes),              [movimientosMes]);
-  const creditosPorDia = useMemo(() => obtenerTotalesPorDia(movimientosMes, "credito"),    [movimientosMes]);
-  const debitosPorDia  = useMemo(() => obtenerTotalesPorDia(movimientosMes, "debito"),     [movimientosMes]);
+        if (!res.ok) {
+          const body = await res.json().catch(() => ({}));
+          throw new Error(body.message ?? "Error al obtener el reporte.");
+        }
 
-  const totalCreditos  = useMemo(() => sumarTotales(creditosPorDia),                       [creditosPorDia]);
-  const totalDebitos   = useMemo(() => sumarTotales(debitosPorDia),                        [debitosPorDia]);
-  const balanceMes     = useMemo(() => calcularBalance(movimientosMes),                    [movimientosMes]);
+        const data: ReporteMensualResponse = await res.json();
 
-  const creditos       = useMemo(() => agruparPorConcepto(movimientosMes, "credito"),      [movimientosMes]);
-  const debitos        = useMemo(() => agruparPorConcepto(movimientosMes, "debito"),       [movimientosMes]);
+        // Sincronizamos el mes activo con lo que resolvió la API
+        setMesActivo(data.mes);
+        setReporte(data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Error desconocido.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  if (!data) {
+    fetchReporte();
+  }, [hojaActiva, mesActivo]);
+
+  // ── Sin archivo cargado ───────────────────────────────────────
+  if (!hojaActiva) {
     return (
       <EmptyState
         title="Sin datos cargados"
@@ -79,40 +78,78 @@ export default function MensualPage() {
     );
   }
 
+  // ── Error ─────────────────────────────────────────────────────
+  if (error) {
+    return (
+      <EmptyState
+        title="Error al cargar el reporte"
+        description={error}
+        href="/"
+        buttonLabel="Volver al inicio"
+      />
+    );
+  }
+
+  // ── Loading ───────────────────────────────────────────────────
+  if (isLoading || !reporte || !mesActivo) {
+    return (
+      <div className={styles.page}>
+        <PageHeader title="Reporte mensual" breadcrumb="Reportes" />
+        <div className={styles.layout}>
+          <div className={styles.skeletonSidebar} />
+          <div className={styles.content}>
+            <div className={styles.skeleton}>
+              <div className={`${styles.skeletonBlock} ${styles.skeletonMain}`} />
+              <div className={styles.skeletonSide}>
+                <div className={styles.skeletonBlock} />
+                <div className={styles.skeletonBlock} />
+              </div>
+            </div>
+            <div className={styles.skeletonResumen}>
+              {Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className={styles.skeletonBlock} />
+              ))}
+            </div>
+            <div className={`${styles.skeletonBlock} ${styles.skeletonTable}`} />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Con datos ─────────────────────────────────────────────────
   return (
     <div className={styles.page}>
       <PageHeader title="Reporte mensual" breadcrumb="Reportes" />
 
       <div className={styles.layout}>
-        {/* ── Sidebar ── */}
         <MesesSidebar
-          meses={meses}
+          meses={reporte.meses}
           mesActivo={mesActivo}
           onMesChange={setMesActivo}
         />
 
-        {/* ── Contenido principal ── */}
         <div className={styles.content}>
-          {/* Gráficos */}
           <div className={styles.chartsGrid}>
             <div className={styles.chartMain}>
-              <BalanceDiarioChart balancePorDia={balancePorDia} />
+              <BalanceDiarioChart balancePorDia={reporte.balancePorDia} />
             </div>
             <div className={styles.chartSide}>
-              <TotalesPorDiaChart totalesPorDia={creditosPorDia} tipo="credito" />
-              <TotalesPorDiaChart totalesPorDia={debitosPorDia}  tipo="debito" />
+              <TotalesPorDiaChart totalesPorDia={reporte.creditosPorDia} tipo="credito" />
+              <TotalesPorDiaChart totalesPorDia={reporte.debitosPorDia}  tipo="debito" />
             </div>
           </div>
 
-          {/* Resumen */}
           <ResumenMensual
-            totalCreditos={totalCreditos}
-            totalDebitos={totalDebitos}
-            balanceMes={balanceMes}
+            totalCreditos={reporte.totalCreditos}
+            totalDebitos={reporte.totalDebitos}
+            balanceMes={reporte.balanceMes}
           />
 
-          {/* Tabla de conceptos */}
-          <ConceptosTable creditos={creditos} debitos={debitos} />
+          <ConceptosTable
+            creditos={reporte.creditos}
+            debitos={reporte.debitos}
+          />
         </div>
       </div>
     </div>

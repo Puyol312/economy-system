@@ -7,40 +7,56 @@ import {
   useCallback,
   ReactNode,
 } from "react";
-import type { Movimiento } from "@/types";
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
 /**
  * Valor expuesto por el ExcelContext.
+ *
+ * Ya no almacena los movimientos en el cliente. Solo guarda
+ * metadata del archivo: nombre, hojas disponibles y hoja activa.
+ * Los movimientos viven en el store del servidor.
  */
 interface ExcelContextValue {
-  /**
-   * Movimientos normalizados provenientes del Excel.
-   * `null` si no se subió ningún archivo aún.
-   */
-  data: Movimiento[] | null;
-
   /** Nombre del archivo subido. `null` si no hay archivo. */
   fileName: string | null;
+
+  /**
+   * Hojas detectadas en el Excel.
+   * `null` si no se subió ningún archivo aún.
+   * @example ["Cuenta Corriente", "Caja de Ahorro"]
+   */
+  hojas: string[] | null;
+
+  /**
+   * Hoja actualmente seleccionada por el usuario.
+   * Se inicializa con la primera hoja al subir el archivo.
+   */
+  hojaActiva: string | null;
 
   /** `true` mientras se espera respuesta de la API. */
   isLoading: boolean;
 
-  /** Mensaje de error si la subida o el parseo falló. `null` si no hay error. */
+  /** Mensaje de error si la subida falló. `null` si no hay error. */
   error: string | null;
 
   /**
-   * Sube el archivo a la API, obtiene los movimientos parseados
-   * y los guarda en el contexto.
+   * Sube el archivo a la API, guarda las hojas detectadas
+   * y establece la primera hoja como activa.
    *
    * @param file - El archivo `.xlsx` seleccionado por el usuario.
    */
   uploadFile: (file: File) => Promise<void>;
 
   /**
-   * Limpia toda la data del contexto.
-   * Permite al usuario quitar el archivo actual y subir uno nuevo.
+   * Cambia la hoja activa.
+   * @param hoja - Nombre de la hoja a activar.
+   */
+  setHojaActiva: (hoja: string) => void;
+
+  /**
+   * Limpia toda la metadata del contexto.
+   * También limpia el store del servidor vía DELETE /api/upload.
    */
   clearData: () => void;
 }
@@ -54,9 +70,13 @@ const ExcelContext = createContext<ExcelContextValue | null>(null);
 /**
  * ExcelProvider
  *
- * Proveedor del contexto global de datos del Excel.
- * Debe envolver toda la app en `layout.tsx` para que cualquier
- * página pueda acceder a la data sin necesidad de re-fetchear.
+ * Proveedor del contexto global del archivo Excel.
+ * Debe envolver toda la app en `layout.tsx`.
+ *
+ * A diferencia de la versión anterior, ya no almacena movimientos
+ * en el cliente. Solo guarda el nombre del archivo, las hojas
+ * disponibles y la hoja activa. Los movimientos viven en el
+ * store del servidor y se consultan vía API.
  *
  * @example
  * ```tsx
@@ -78,10 +98,11 @@ const ExcelContext = createContext<ExcelContextValue | null>(null);
  * ```
  */
 export function ExcelProvider({ children }: { children: ReactNode }) {
-  const [data, setData] = useState<Movimiento[] | null>(null);
-  const [fileName, setFileName] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [fileName, setFileName]       = useState<string | null>(null);
+  const [hojas, setHojas]             = useState<string[] | null>(null);
+  const [hojaActiva, setHojaActiva]   = useState<string | null>(null);
+  const [isLoading, setIsLoading]     = useState(false);
+  const [error, setError]             = useState<string | null>(null);
 
   const uploadFile = useCallback(async (file: File) => {
     setIsLoading(true);
@@ -101,9 +122,11 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
         throw new Error(body.message ?? "Error al procesar el archivo.");
       }
 
-      const { movimientos }: { movimientos: Movimiento[] } = await res.json();
-      setData(movimientos);
+      const { hojas: hojasDetectadas }: { hojas: string[] } = await res.json();
+
       setFileName(file.name);
+      setHojas(hojasDetectadas);
+      setHojaActiva(hojasDetectadas[0] ?? null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error desconocido.");
     } finally {
@@ -112,14 +135,24 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const clearData = useCallback(() => {
-    setData(null);
     setFileName(null);
+    setHojas(null);
+    setHojaActiva(null);
     setError(null);
   }, []);
 
   return (
     <ExcelContext.Provider
-      value={{ data, fileName, isLoading, error, uploadFile, clearData }}
+      value={{
+        fileName,
+        hojas,
+        hojaActiva,
+        isLoading,
+        error,
+        uploadFile,
+        setHojaActiva,
+        clearData,
+      }}
     >
       {children}
     </ExcelContext.Provider>
@@ -136,10 +169,7 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
  *
  * @example
  * ```tsx
- * const { data, fileName, isLoading } = useExcel();
- *
- * // data es Movimiento[] | null
- * data?.filter(m => m.tipo === "credito")
+ * const { hojas, hojaActiva, setHojaActiva, isLoading } = useExcel();
  * ```
  */
 export function useExcel(): ExcelContextValue {
