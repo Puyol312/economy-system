@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "test": "ava"
   },
   "dependencies": {
     "next": "16.2.3",
@@ -18,7 +19,9 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "ava": "^7.0.0",
     "babel-plugin-react-compiler": "1.0.0",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }
