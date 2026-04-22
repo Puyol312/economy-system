@@ -65,14 +65,14 @@ src/
 
 El archivo `.xlsx` debe tener la siguiente estructura en cada hoja:
 
-| DIA        | CONCEPTO     | DEBITO | CREDITO |
+| FECHA      | ASUNTO       | DEBITO | CREDITO |
 |------------|--------------|--------|---------|
 | 2026-04-01 | Sueldo       |        | 50000   |
 | 2026-04-02 | Supermercado | 8000   |         |
 | 2026-04-15 | Alquiler     | 20000  |         |
 
 - La **primera fila** debe contener los encabezados exactamente como se muestran.
-- Las fechas deben estar en formato `YYYY-MM-DD`.
+- Las fechas deben estar en formato `mm/dd/yyyy`.
 - Cada fila tiene valor en `DEBITO` o en `CREDITO`, nunca en ambos.
 - Se soportan **múltiples hojas** en el mismo archivo.
 

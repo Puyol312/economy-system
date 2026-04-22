@@ -1,10 +1,32 @@
 import type { RowExcel, Movimiento } from "@/types";
 
 /**
+ * parsearFecha
+ *
+ * Convierte una fecha en formato MM/DD/AAAA al formato AAAA-MM-DD
+ * que usan los controladores internamente.
+ *
+ * @param fecha - Fecha en formato MM/DD/AAAA. Ej: "04/01/2026"
+ * @returns Fecha en formato AAAA-MM-DD. Ej: "2026-04-01"
+ *
+ * @example
+ * parsearFecha("04/01/2026") // "2026-04-01"
+ * parsearFecha("12/31/2026") // "2026-12-31"
+ */
+const parsearFecha = (fecha: string): string => {
+  const [mm, dd, aaaa] = fecha.split("/");
+  return `${aaaa}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
+};
+
+/**
  * mapearMovimientos
  *
  * Transforma un arreglo de filas crudas del Excel en un arreglo
  * de objetos `Movimiento` normalizados.
+ *
+ * Espera las columnas `FECHA` (MM/DD/AAAA) y `ASUNTO` del Excel.
+ * La fecha se convierte internamente a `AAAA-MM-DD` para que los
+ * controladores funcionen correctamente sin depender de zona horaria.
  *
  * - Si `CREDITO > 0` → tipo "credito"
  * - Si `DEBITO > 0`  → tipo "debito"
@@ -18,37 +40,37 @@ import type { RowExcel, Movimiento } from "@/types";
  *
  * @example
  * const rows = [
- *   { DIA: "2026-04-01", CONCEPTO: "Sueldo", CREDITO: 50000 },
- *   { DIA: "2026-04-02", CONCEPTO: "Supermercado", DEBITO: 3000 },
+ *   { FECHA: "04/01/2026", ASUNTO: "Sueldo",       CREDITO: 50000 },
+ *   { FECHA: "04/02/2026", ASUNTO: "Supermercado", DEBITO: 3000   },
  * ];
  *
  * mapearMovimientos(rows);
  * // [
- * //   { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
- * //   { dia: "2026-04-02", concepto: "Supermercado", monto: 3000, tipo: "debito" },
+ * //   { dia: "2026-04-01", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
+ * //   { dia: "2026-04-02", concepto: "Supermercado", monto: 3000,  tipo: "debito"  },
  * // ]
  */
 export const mapearMovimientos = (rows: RowExcel[]): Movimiento[] => {
   return rows
     .map((row) => {
       const credito = Number(row.CREDITO) || 0;
-      const debito = Number(row.DEBITO) || 0;
+      const debito  = Number(row.DEBITO)  || 0;
 
       if (credito > 0) {
         return {
-          dia: row.DIA,
-          concepto: row.CONCEPTO,
-          monto: credito,
-          tipo: "credito" as const,
+          dia:      parsearFecha(row.FECHA),
+          concepto: row.ASUNTO,
+          monto:    credito,
+          tipo:     "credito" as const,
         };
       }
 
       if (debito > 0) {
         return {
-          dia: row.DIA,
-          concepto: row.CONCEPTO,
-          monto: debito,
-          tipo: "debito" as const,
+          dia:      parsearFecha(row.FECHA),
+          concepto: row.ASUNTO,
+          monto:    debito,
+          tipo:     "debito" as const,
         };
       }
 

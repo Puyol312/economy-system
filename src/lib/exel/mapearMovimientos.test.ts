@@ -6,7 +6,7 @@ import type { RowExcel } from "@/types";
 
 test("mapea una fila con crédito correctamente", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sueldo", CREDITO: 50000 },
+    { FECHA: "04/01/2026", ASUNTO: "Sueldo", CREDITO: 50000 },
   ];
 
   const result = mapearMovimientos(rows);
@@ -18,7 +18,7 @@ test("mapea una fila con crédito correctamente", (t) => {
 
 test("mapea una fila con débito correctamente", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-02", CONCEPTO: "Supermercado", DEBITO: 8000 },
+    { FECHA: "04/02/2026", ASUNTO: "Supermercado", DEBITO: 8000 },
   ];
 
   const result = mapearMovimientos(rows);
@@ -30,9 +30,9 @@ test("mapea una fila con débito correctamente", (t) => {
 
 test("mapea múltiples filas con créditos y débitos", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sueldo",       CREDITO: 50000 },
-    { DIA: "2026-04-02", CONCEPTO: "Supermercado", DEBITO: 8000   },
-    { DIA: "2026-04-03", CONCEPTO: "Freelance",    CREDITO: 10000 },
+    { FECHA: "04/01/2026", ASUNTO: "Sueldo",       CREDITO: 50000 },
+    { FECHA: "04/02/2026", ASUNTO: "Supermercado", DEBITO: 8000   },
+    { FECHA: "04/03/2026", ASUNTO: "Freelance",    CREDITO: 10000 },
   ];
 
   const result = mapearMovimientos(rows);
@@ -43,34 +43,70 @@ test("mapea múltiples filas con créditos y débitos", (t) => {
   t.is(result[2].tipo, "credito");
 });
 
+// ─── Conversión de fecha ──────────────────────────────────────────────────────
+
+test("convierte fecha MM/DD/AAAA a AAAA-MM-DD correctamente", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "04/01/2026", ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result[0].dia, "2026-04-01");
+});
+
+test("convierte fecha del último día del mes correctamente", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "03/31/2026", ASUNTO: "Pago", DEBITO: 1000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result[0].dia, "2026-03-31");
+});
+
+test("convierte fecha del primer día del mes correctamente", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "03/01/2026", ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result[0].dia, "2026-03-01");
+});
+
+test("convierte correctamente diciembre", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "12/31/2026", ASUNTO: "Cierre", CREDITO: 1000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result[0].dia, "2026-12-31");
+});
+
 // ─── Filas inválidas ──────────────────────────────────────────────────────────
 
 test("ignora filas sin crédito ni débito", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sin monto" },
+    { FECHA: "04/01/2026", ASUNTO: "Sin monto" },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result.length, 0);
 });
 
 test("ignora filas con crédito y débito en cero", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Cero", CREDITO: 0, DEBITO: 0 },
+    { FECHA: "04/01/2026", ASUNTO: "Cero", CREDITO: 0, DEBITO: 0 },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result.length, 0);
 });
 
 test("ignora filas con valores inválidos y procesa las válidas", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sin monto"  },
-    { DIA: "2026-04-02", CONCEPTO: "Sueldo",    CREDITO: 50000 },
-    { DIA: "2026-04-03", CONCEPTO: "Otro cero", DEBITO: 0      },
-    { DIA: "2026-04-04", CONCEPTO: "Alquiler",  DEBITO: 20000  },
+    { FECHA: "04/01/2026", ASUNTO: "Sin monto"  },
+    { FECHA: "04/02/2026", ASUNTO: "Sueldo",    CREDITO: 50000 },
+    { FECHA: "04/03/2026", ASUNTO: "Otro cero", DEBITO: 0      },
+    { FECHA: "04/04/2026", ASUNTO: "Alquiler",  DEBITO: 20000  },
   ];
 
   const result = mapearMovimientos(rows);
@@ -89,21 +125,19 @@ test("devuelve array vacío si no recibe filas", (t) => {
 
 test("convierte strings numéricos a número", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sueldo", CREDITO: "50000" as unknown as number },
+    { FECHA: "04/01/2026", ASUNTO: "Sueldo", CREDITO: "50000" as unknown as number },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result[0].monto, 50000);
 });
 
 test("prioriza crédito sobre débito si ambos son mayores a cero", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Raro", CREDITO: 1000, DEBITO: 500 },
+    { FECHA: "04/01/2026", ASUNTO: "Raro", CREDITO: 1000, DEBITO: 500 },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result[0].tipo, "credito");
   t.is(result[0].monto, 1000);
 });
@@ -112,20 +146,18 @@ test("prioriza crédito sobre débito si ambos son mayores a cero", (t) => {
 
 test("el tipo del resultado es 'credito' como literal", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Sueldo", CREDITO: 50000 },
+    { FECHA: "04/01/2026", ASUNTO: "Sueldo", CREDITO: 50000 },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result[0].tipo, "credito");
 });
 
 test("el tipo del resultado es 'debito' como literal", (t) => {
   const rows: RowExcel[] = [
-    { DIA: "2026-04-01", CONCEPTO: "Alquiler", DEBITO: 20000 },
+    { FECHA: "04/01/2026", ASUNTO: "Alquiler", DEBITO: 20000 },
   ];
 
   const result = mapearMovimientos(rows);
-
   t.is(result[0].tipo, "debito");
 });
