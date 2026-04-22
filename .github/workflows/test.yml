@@ -28,9 +28,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Ver estructura
-        run: ls -la
-
       - name: Instalar dependencias
         run: pnpm install
 
