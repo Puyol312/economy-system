@@ -20,12 +20,9 @@
   gap: 8px;
 }
 
-.logoDot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #1d9e75;
-  display: inline-block;
+.logoImage {
+  border-radius: 13px;
+  object-fit: cover;
 }
 
 .nav {

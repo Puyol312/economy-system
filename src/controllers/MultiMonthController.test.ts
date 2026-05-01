@@ -4,6 +4,8 @@ import {
   obtenerTotalesPorMes,
   obtenerAcumulado,
   agruparMovimientosPorMes,
+  calcularSaldoAcumulado,
+  
 } from "./MultiMonthController";
 import type { Movimiento } from "@/types";
 
@@ -162,4 +164,67 @@ test("obtenerAcumulado — resultado correcto con balance real", (t) => {
 
   // 22000 + 44000 + 47000 = 113000
   t.is(acumulado, 113000);
+});
+
+// ─── Tests ────────────────────────────────────────────────────────────────────
+
+test("acumula el saldo mes a mes correctamente", (t) => {
+  const result = calcularSaldoAcumulado(movimientos);
+
+  // enero: 50000 - 20000 - 8000 = 22000
+  // febrero: 22000 + (50000 - 6000) = 22000 + 44000 = 66000
+  // marzo: 66000 + (50000 - 3000) = 66000 + 47000 = 113000
+  t.is(result["2026-01"], 22000);
+  t.is(result["2026-02"], 66000);
+  t.is(result["2026-03"], 113000);
+});
+
+test("genera las claves de los tres meses", (t) => {
+  const result = calcularSaldoAcumulado(movimientos);
+  t.deepEqual(Object.keys(result).sort(), ["2026-01", "2026-02", "2026-03"]);
+});
+
+test("devuelve objeto vacío con array vacío", (t) => {
+  t.deepEqual(calcularSaldoAcumulado([]), {});
+});
+
+test("saldo puede ser negativo si los débitos superan los créditos acumulados", (t) => {
+  const movs: Movimiento[] = [
+    { dia: "2026-01-01", concepto: "Sueldo",    monto: 10000, tipo: "credito" },
+    { dia: "2026-02-01", concepto: "Alquiler",  monto: 15000, tipo: "debito"  },
+  ];
+
+  const result = calcularSaldoAcumulado(movs);
+
+  t.is(result["2026-01"], 10000);
+  t.is(result["2026-02"], -5000);
+});
+
+test("un mes con gasto mayor al saldo acumulado da negativo", (t) => {
+  const movs: Movimiento[] = [
+    { dia: "2026-01-01", concepto: "Sueldo",        monto: 1000,  tipo: "credito" },
+    { dia: "2026-02-01", concepto: "Gasto grande",  monto: 5000,  tipo: "debito"  },
+    { dia: "2026-03-01", concepto: "Sueldo",        monto: 10000, tipo: "credito" },
+  ];
+
+  const result = calcularSaldoAcumulado(movs);
+
+  t.is(result["2026-01"], 1000);
+  t.is(result["2026-02"], -4000);
+  t.is(result["2026-03"], 6000);
+});
+
+test("respeta el orden cronológico independientemente del orden del input", (t) => {
+  const movsDesordenados: Movimiento[] = [
+    { dia: "2026-03-01", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
+    { dia: "2026-01-05", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
+    { dia: "2026-01-10", concepto: "Alquiler", monto: 28000, tipo: "debito"  },
+    { dia: "2026-02-03", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
+  ];
+
+  const result = calcularSaldoAcumulado(movsDesordenados);
+
+  t.is(result["2026-01"], 22000);
+  t.is(result["2026-02"], 72000);
+  t.is(result["2026-03"], 122000);
 });

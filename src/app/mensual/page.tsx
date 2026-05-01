@@ -12,12 +12,6 @@ import ResumenMensual from "./components/ResumenMensual";
 import ConceptosTable from "./components/ConceptosTable";
 import styles from "./page.module.css";
 
-/**
- * MensualPage — `/mensual`
- *
- * Página de reporte mensual. Manda los movimientos de la hoja activa
- * al endpoint POST /api/reportes/mensual junto con el mes seleccionado.
- */
 export default function MensualPage() {
   const { hojaActiva, movimientosPorHoja } = useExcel();
 
@@ -101,7 +95,7 @@ export default function MensualPage() {
               </div>
             </div>
             <div className={styles.skeletonResumen}>
-              {Array.from({ length: 3 }).map((_, i) => (
+              {Array.from({ length: 4 }).map((_, i) => (
                 <div key={i} className={styles.skeletonBlock} />
               ))}
             </div>
@@ -135,6 +129,7 @@ export default function MensualPage() {
             totalCreditos={reporte.totalCreditos}
             totalDebitos={reporte.totalDebitos}
             balanceMes={reporte.balanceMes}
+            saldoAlCierre={reporte.saldoAlCierre}
           />
           <ConceptosTable
             creditos={reporte.creditos}

@@ -4,8 +4,12 @@ import Navbar from "@/components/Navbar";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "MiApp",
-  description: "Dashboard de reportes",
+  title: "EcoS",
+  description:
+    "Visualizá y analizá tus movimientos financieros. Importá tu archivo Excel y explorá reportes mensuales y anuales de forma simple e interactiva.",
+  icons: {
+    icon: "/icon.png",
+  },
 };
 
 /**
@@ -14,11 +18,10 @@ export const metadata: Metadata = {
  * Layout raíz de la aplicación. Se aplica a todas las rutas.
  *
  * Incluye:
- * - El `<Navbar>` persistente en la parte superior.
- * - El área `<main>` donde cada página inyecta su contenido.
- *
- * Para agregar elementos globales (sidebar, footer global, etc.)
- * hacerlo aquí.
+ * - `ExcelProvider` — envuelve toda la app para que la data del
+ *   Excel esté disponible globalmente en cualquier página.
+ * - `Navbar` — barra de navegación persistente.
+ * - `main` — área donde cada página inyecta su contenido.
  */
 export default function RootLayout({
   children,
