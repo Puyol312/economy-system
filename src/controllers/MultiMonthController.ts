@@ -200,3 +200,56 @@ export const agruparMovimientosPorMes = (
     return acc;
   }, {} as Record<string, Movimiento[]>);
 };
+/**
+ * calcularSaldoAcumulado
+ *
+ * Calcula el saldo acumulado mes a mes a partir de los movimientos.
+ * Cada mes parte del saldo final del mes anterior, reflejando
+ * el estado real del dinero disponible en cada momento.
+ *
+ * A diferencia de `calcularBalancePorMes` que devuelve el balance
+ * neto de cada mes de forma independiente, esta función acumula
+ * los resultados mes a mes.
+ *
+ * Proceso:
+ * 1. Obtiene el balance neto por mes con `calcularBalancePorMes`.
+ * 2. Ordena los meses cronológicamente.
+ * 3. Recorre los meses acumulando el saldo.
+ *
+ * @param movimientos - Array de objetos de tipo Movimiento.
+ *
+ * @returns Un objeto (Record<string, number>) donde:
+ * - La clave es el mes en formato "YYYY-MM".
+ * - El valor es el saldo acumulado al cierre de ese mes.
+ *
+ * @example
+ * const movimientos = [
+ *   { dia: "2026-01-05", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
+ *   { dia: "2026-01-10", concepto: "Alquiler",     monto: 28000, tipo: "debito"  },
+ *   { dia: "2026-02-03", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
+ *   { dia: "2026-02-08", concepto: "Supermercado", monto: 6000,  tipo: "debito"  },
+ * ];
+ *
+ * calcularSaldoAcumulado(movimientos);
+ *
+ * // {
+ * //   "2026-01": 22000,   ← balance neto de enero
+ * //   "2026-02": 66000,   ← 22000 + balance neto de febrero (44000)
+ * // }
+ */
+export const calcularSaldoAcumulado = (
+  movimientos: Movimiento[]
+): Record<string, number> => {
+  const balancePorMes = calcularBalancePorMes(movimientos);
+  const mesesOrdenados = Object.keys(balancePorMes).sort();
+
+  let saldoAcumulado = 0;
+  const resultado: Record<string, number> = {};
+
+  for (const mes of mesesOrdenados) {
+    saldoAcumulado += balancePorMes[mes];
+    resultado[mes] = saldoAcumulado;
+  }
+
+  return resultado;
+};

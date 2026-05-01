@@ -10,12 +10,6 @@ import TotalesPorMesChart from "./components/TotalesPorMesChart";
 import ResumenAnual from "./components/ResumenAnual";
 import styles from "./page.module.css";
 
-/**
- * AnualPage — `/anual`
- *
- * Página de reporte anual. Manda los movimientos de la hoja activa
- * al endpoint POST /api/reportes/anual y renderiza los resultados.
- */
 export default function AnualPage() {
   const { hojaActiva, movimientosPorHoja } = useExcel();
 
@@ -107,7 +101,10 @@ export default function AnualPage() {
       <div className={styles.content}>
         <div className={styles.chartsGrid}>
           <div className={styles.chartMain}>
-            <BalanceAnualChart balancePorMes={reporte.balancePorMes} />
+            <BalanceAnualChart
+              balancePorMes={reporte.balancePorMes}
+              saldoAcumulado={reporte.saldoAcumulado}
+            />
           </div>
           <div className={styles.chartSide}>
             <TotalesPorMesChart totalesPorMes={reporte.creditosPorMes} tipo="credito" />

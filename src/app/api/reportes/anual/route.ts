@@ -4,6 +4,7 @@ import {
   calcularBalancePorMes,
   obtenerTotalesPorMes,
   obtenerAcumulado,
+  calcularSaldoAcumulado
 } from "@/controllers/MultiMonthController";
 
 /**
@@ -13,6 +14,7 @@ import {
  */
 export interface ReporteAnualResponse {
   balancePorMes:  Record<string, number>;
+  saldoAcumulado: Record<string, number>;
   creditosPorMes: Record<string, number>;
   debitosPorMes:  Record<string, number>;
   totalCreditos:  number;
@@ -28,22 +30,11 @@ export interface ReporteAnualResponse {
  * controladores y devuelve todos los cálculos necesarios para
  * renderizar la página `/anual`.
  *
- * Los movimientos vienen del ExcelContext en el cliente,
- * sin necesidad de estado en el servidor.
- *
  * Body: `{ movimientos: Movimiento[] }`
  *
  * Respuestas:
  * - `200` → `ReporteAnualResponse`
  * - `400` → `{ message: string }` si falta el body o los movimientos.
- *
- * @example
- * const res = await fetch("/api/reportes/anual", {
- *   method: "POST",
- *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ movimientos }),
- * });
- * const reporte = await res.json();
  */
 export async function POST(req: NextRequest) {
   let body: { movimientos?: Movimiento[] };
@@ -68,6 +59,7 @@ export async function POST(req: NextRequest) {
 
   // ── Cálculos ──────────────────────────────────────────────────
   const balancePorMes  = calcularBalancePorMes(movimientos);
+  const saldoAcumulado = calcularSaldoAcumulado(movimientos);
   const creditosPorMes = obtenerTotalesPorMes(movimientos, "credito");
   const debitosPorMes  = obtenerTotalesPorMes(movimientos, "debito");
 
@@ -80,6 +72,7 @@ export async function POST(req: NextRequest) {
 
   const response: ReporteAnualResponse = {
     balancePorMes,
+    saldoAcumulado,
     creditosPorMes,
     debitosPorMes,
     totalCreditos,

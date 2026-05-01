@@ -1,26 +1,26 @@
 "use client";
 
 import {
-  BarChart,
+  ComposedChart,
   Bar,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   Cell,
+  Legend,
 } from "recharts";
 import styles from "./BalanceAnualChart.module.css";
 
 /**
  * Entrada de dato para el gráfico.
- * Se construye a partir del resultado de `calcularBalancePorMes`.
  */
 interface BalanceMesData {
-  /** Mes en formato corto: "Ene", "Feb", etc. */
-  mes: string;
-  /** Balance neto del mes (puede ser negativo) */
-  balance: number;
+  mes:            string;
+  balance:        number;
+  saldoAcumulado: number;
 }
 
 /**
@@ -32,16 +32,12 @@ export interface BalanceAnualChartProps {
    * @example { "2026-01": 30000, "2026-02": -5000 }
    */
   balancePorMes: Record<string, number>;
-}
 
-/**
- * Props del tooltip personalizado.
- * Se tipan manualmente para evitar incompatibilidades entre versiones de recharts.
- */
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: { value?: number }[];
-  label?: string;
+  /**
+   * Record de saldo acumulado por mes proveniente de `calcularSaldoAcumulado`.
+   * @example { "2026-01": 30000, "2026-02": 25000 }
+   */
+  saldoAcumulado: Record<string, number>;
 }
 
 /** Nombres cortos de los meses para el eje X */
@@ -53,7 +49,6 @@ const MESES_CORTOS: Record<string, string> = {
 
 /**
  * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
  */
 const formatearMoneda = (valor: number): string =>
   new Intl.NumberFormat("es-AR", {
@@ -63,20 +58,34 @@ const formatearMoneda = (valor: number): string =>
   }).format(valor);
 
 /**
- * Tooltip personalizado para el gráfico de balance.
+ * Props del tooltip personalizado.
+ */
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: { value?: number; name?: string; color?: string }[];
+  label?: string;
+}
+
+/**
+ * Tooltip personalizado para el gráfico combinado.
  */
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
-  const valor = payload[0].value ?? 0;
-  const esPositivo = valor >= 0;
-
   return (
     <div className={styles.tooltip}>
       <p className={styles.tooltipLabel}>{label}</p>
-      <p className={`${styles.tooltipValue} ${esPositivo ? styles.positivo : styles.negativo}`}>
-        {formatearMoneda(valor)}
-      </p>
+      {payload.map((entry, i) => (
+        <p
+          key={i}
+          className={styles.tooltipValue}
+          style={{ color: entry.color }}
+        >
+          {entry.name === "balance" ? "Balance del mes" : "Saldo acumulado"}
+          {": "}
+          {formatearMoneda(entry.value ?? 0)}
+        </p>
+      ))}
     </div>
   );
 }
@@ -84,29 +93,33 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 /**
  * BalanceAnualChart
  *
- * Gráfico de barras que muestra el balance neto mensual a lo largo del año.
- * Las barras positivas se muestran en verde y las negativas en rojo.
+ * Gráfico combinado que muestra:
+ * - Barras: balance neto mensual (verde positivo, rojo negativo).
+ * - Línea: saldo acumulado mes a mes en violeta.
  *
- * Recibe directamente el resultado de `calcularBalancePorMes` del
- * `MultiMonthController` y lo transforma internamente al formato
- * que necesita Recharts.
+ * Recibe directamente los resultados de `calcularBalancePorMes`
+ * y `calcularSaldoAcumulado` del endpoint `/api/reportes/anual`.
  *
  * @example
  * ```tsx
- * // app/anual/page.tsx
- * const balancePorMes = calcularBalancePorMes(data);
- *
- * <BalanceAnualChart balancePorMes={balancePorMes} />
+ * <BalanceAnualChart
+ *   balancePorMes={reporte.balancePorMes}
+ *   saldoAcumulado={reporte.saldoAcumulado}
+ * />
  * ```
  */
-export default function BalanceAnualChart({ balancePorMes }: BalanceAnualChartProps) {
-  const chartData: BalanceMesData[] = Object.entries(balancePorMes)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([mes, balance]) => {
+export default function BalanceAnualChart({
+  balancePorMes,
+  saldoAcumulado,
+}: BalanceAnualChartProps) {
+  const chartData: BalanceMesData[] = Object.keys(balancePorMes)
+    .sort()
+    .map((mes) => {
       const [, mm] = mes.split("-");
       return {
-        mes: MESES_CORTOS[mm] ?? mes,
-        balance,
+        mes:            MESES_CORTOS[mm] ?? mes,
+        balance:        balancePorMes[mes],
+        saldoAcumulado: saldoAcumulado[mes] ?? 0,
       };
     });
 
@@ -115,7 +128,7 @@ export default function BalanceAnualChart({ balancePorMes }: BalanceAnualChartPr
       <p className={styles.title}>Balance por mes</p>
       <div className={styles.chart}>
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart
+          <ComposedChart
             data={chartData}
             margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
             barCategoryGap="35%"
@@ -147,7 +160,13 @@ export default function BalanceAnualChart({ balancePorMes }: BalanceAnualChartPr
               content={<CustomTooltip />}
               cursor={{ fill: "var(--surface)" }}
             />
-            <Bar dataKey="balance" radius={[4, 4, 0, 0]}>
+            <Legend
+              formatter={(value) =>
+                value === "balance" ? "Balance del mes" : "Saldo acumulado"
+              }
+              wrapperStyle={{ fontSize: 12, color: "var(--text-secondary)" }}
+            />
+            <Bar dataKey="balance" radius={[4, 4, 0, 0]} name="balance">
               {chartData.map((entry, index) => (
                 <Cell
                   key={index}
@@ -155,7 +174,16 @@ export default function BalanceAnualChart({ balancePorMes }: BalanceAnualChartPr
                 />
               ))}
             </Bar>
-          </BarChart>
+            <Line
+              type="monotone"
+              dataKey="saldoAcumulado"
+              name="saldoAcumulado"
+              stroke="#6366f1"
+              strokeWidth={2}
+              dot={{ r: 3, fill: "#6366f1", strokeWidth: 0 }}
+              activeDot={{ r: 5, fill: "#6366f1", strokeWidth: 0 }}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
     </div>

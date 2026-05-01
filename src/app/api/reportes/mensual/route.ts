@@ -5,9 +5,9 @@ import {
   calcularBalancePorDia,
   obtenerTotalesPorDia,
   sumarTotales,
+  agruparPorConcepto
 } from "@/controllers/SingleMonthController";
-import { agruparMovimientosPorMes } from "@/controllers/MultiMonthController";
-import { agruparPorConcepto } from "@/controllers/SingleMonthController";
+import { agruparMovimientosPorMes, calcularSaldoAcumulado } from "@/controllers/MultiMonthController";
 
 /**
  * ReporteMensualResponse
@@ -15,25 +15,24 @@ import { agruparPorConcepto } from "@/controllers/SingleMonthController";
  * Estructura del JSON que devuelve este endpoint.
  */
 export interface ReporteMensualResponse {
-  meses:          string[];
-  mes:            string;
-  balancePorDia:  Record<string, number>;
-  creditosPorDia: Record<string, number>;
-  debitosPorDia:  Record<string, number>;
-  totalCreditos:  number;
-  totalDebitos:   number;
-  balanceMes:     number;
-  creditos:       [string, number][];
-  debitos:        [string, number][];
+  meses:           string[];
+  mes:             string;
+  balancePorDia:   Record<string, number>;
+  creditosPorDia:  Record<string, number>;
+  debitosPorDia:   Record<string, number>;
+  totalCreditos:   number;
+  totalDebitos:    number;
+  balanceMes:      number;
+  /** Saldo acumulado al cierre del mes seleccionado. */
+  saldoAlCierre:   number;
+  creditos:        [string, number][];
+  debitos:         [string, number][];
 }
 
 /**
  * POST /api/reportes/mensual
  *
- * Recibe los movimientos de una hoja y el mes a analizar en el body,
- * aplica los controladores y devuelve todos los cálculos necesarios
- * para renderizar la página `/mensual`.
- *
+ * Recibe los movimientos de una hoja y el mes a analizar en el body.
  * Si `mes` no se provee o no existe, usa el primer mes disponible.
  *
  * Body: `{ movimientos: Movimiento[], mes?: string }`
@@ -42,14 +41,6 @@ export interface ReporteMensualResponse {
  * - `200` → `ReporteMensualResponse`
  * - `400` → `{ message: string }` si falta el body o los movimientos.
  * - `404` → `{ message: string }` si no hay meses disponibles.
- *
- * @example
- * const res = await fetch("/api/reportes/mensual", {
- *   method: "POST",
- *   headers: { "Content-Type": "application/json" },
- *   body: JSON.stringify({ movimientos, mes: "2026-04" }),
- * });
- * const reporte = await res.json();
  */
 export async function POST(req: NextRequest) {
   let body: { movimientos?: Movimiento[]; mes?: string };
@@ -99,6 +90,10 @@ export async function POST(req: NextRequest) {
   const creditos       = agruparPorConcepto(movimientosMes, "credito");
   const debitos        = agruparPorConcepto(movimientosMes, "debito");
 
+  // Saldo acumulado al cierre del mes seleccionado
+  const saldoAcumuladoPorMes = calcularSaldoAcumulado(movimientos);
+  const saldoAlCierre        = saldoAcumuladoPorMes[mes] ?? 0;
+
   const response: ReporteMensualResponse = {
     meses,
     mes,
@@ -108,6 +103,7 @@ export async function POST(req: NextRequest) {
     totalCreditos,
     totalDebitos,
     balanceMes,
+    saldoAlCierre,
     creditos,
     debitos,
   };
