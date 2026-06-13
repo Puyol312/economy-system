@@ -161,3 +161,75 @@ test("el tipo del resultado es 'debito' como literal", (t) => {
   const result = mapearMovimientos(rows);
   t.is(result[0].tipo, "debito");
 });
+// ─── Validación de fecha ──────────────────────────────────────────────────────
+
+test("ignora filas con fecha que no es string", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: 46112 as unknown as string, ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+test("ignora filas con fecha undefined", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: undefined as unknown as string, ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+test("ignora filas con fecha en formato incorrecto", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "2026-04-01", ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+test("ignora filas con fecha vacía", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "", ASUNTO: "Sueldo", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+// ─── Validación de ASUNTO ─────────────────────────────────────────────────────
+
+test("ignora filas con ASUNTO undefined", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "04/01/2026", ASUNTO: undefined as unknown as string, CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+test("ignora filas con ASUNTO vacío", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: "04/01/2026", ASUNTO: "", CREDITO: 50000 },
+  ];
+
+  const result = mapearMovimientos(rows);
+  t.is(result.length, 0);
+});
+
+test("procesa correctamente filas válidas junto a filas con fecha inválida", (t) => {
+  const rows: RowExcel[] = [
+    { FECHA: 46112 as unknown as string, ASUNTO: "Sueldo",    CREDITO: 50000 },
+    { FECHA: "04/02/2026",               ASUNTO: "Freelance", CREDITO: 10000 },
+    { FECHA: "",                          ASUNTO: "Alquiler",  DEBITO: 20000  },
+    { FECHA: "04/04/2026",               ASUNTO: "Gym",       DEBITO: 3000   },
+  ];
+
+  const result = mapearMovimientos(rows);
+
+  t.is(result.length, 2);
+  t.is(result[0].concepto, "Freelance");
+  t.is(result[1].concepto, "Gym");
+});
