@@ -17,7 +17,28 @@ const parsearFecha = (fecha: string): string => {
   const [mm, dd, aaaa] = fecha.split("/");
   return `${aaaa}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
 };
-
+/**
+ * esFechaValida
+ *
+ * \Valida que la fecha tenga el formato MM/DD/AAAA y que no este vacia.
+ * Si no es una cadena o no tiene el formato correcto, devuelve false.
+ *
+ * @param fecha - Fecha en formato MM/DD/AAAA. Ej: "04/01/2026"
+ * @returns boolean indicando si la fecha es valida o no.
+ *
+ * @example
+ * esFechaValida("04/01/2026") // true
+ * esFechaValida("12/31/2026") // true
+ * esFechaValida("2026-04-01") // false
+ * esFechaValida("")             // false
+ * esFechaValida(null)           // false
+ * esFechaValida(undefined)      // false
+ */
+const esFechaValida = (fecha: unknown): fecha is string => {
+  if (typeof fecha !== "string") return false;
+  const partes = fecha.split("/");
+  return partes.length === 3 && partes.every(p => p.length > 0);
+};
 /**
  * mapearMovimientos
  *
@@ -54,8 +75,11 @@ export const mapearMovimientos = (rows: RowExcel[]): Movimiento[] => {
   return rows
     .map((row) => {
       const credito = Number(row.CREDITO) || 0;
-      const debito  = Number(row.DEBITO)  || 0;
-
+      const debito = Number(row.DEBITO) || 0;
+      
+      if (!esFechaValida(row.FECHA)) return null;
+      if (typeof row.ASUNTO !== "string" || !row.ASUNTO.trim()) return null;
+      
       if (credito > 0) {
         return {
           dia:      parsearFecha(row.FECHA),

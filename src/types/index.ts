@@ -3,10 +3,10 @@
  * Las columnas esperadas son: DIA, CONCEPTO, DEBITO, CREDITO.
  */
 export type RowExcel = {
-  FECHA: string;
-  ASUNTO: string;
-  DEBITO?: number;
-  CREDITO?: number;
+  FECHA: unknown;
+  ASUNTO: unknown;
+  DEBITO?: unknown;
+  CREDITO?: unknown;
 };
 
 /**

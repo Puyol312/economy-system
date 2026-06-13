@@ -70,8 +70,18 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const { hojas, movimientosPorHoja } = parseExcel(buffer);
-
-    return NextResponse.json({ hojas, movimientosPorHoja });
+    const hojasFiltradas = hojas.filter(
+      (h) => h.toLowerCase() !== "admin"
+    );
+    const movimientosFiltrados = Object.fromEntries(
+			Object.entries(movimientosPorHoja).filter(
+				([hoja]) => hoja.toLowerCase() !== "admin",
+			),
+		);
+    return NextResponse.json({
+      hojas: hojasFiltradas,
+      movimientosPorHoja: movimientosFiltrados
+    });
   } catch (err) {
     const message =
       err instanceof Error ? err.message : "Error al procesar el archivo.";
