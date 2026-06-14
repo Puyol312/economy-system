@@ -55,7 +55,6 @@ export async function POST(req: NextRequest) {
   }
 
   const { movimientos, mes: mesParam } = body;
-
   if (!movimientos || !Array.isArray(movimientos)) {
     return NextResponse.json(
       { message: "El campo 'movimientos' es requerido." },
@@ -66,7 +65,6 @@ export async function POST(req: NextRequest) {
   // ── Meses disponibles ─────────────────────────────────────────
   const movimientosPorMes = agruparMovimientosPorMes(movimientos);
   const meses             = Object.keys(movimientosPorMes).sort();
-
   if (meses.length === 0) {
     return NextResponse.json(
       { message: "No hay meses disponibles en los datos." },

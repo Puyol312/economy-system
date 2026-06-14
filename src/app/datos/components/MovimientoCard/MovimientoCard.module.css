@@ -1,0 +1,105 @@
+.card {
+  background: var(--background);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-left-width: 3px;
+}
+
+.card.credito {
+  border-left-color: #1d9e75;
+}
+
+.card.debito {
+  border-left-color: #d85a30;
+}
+
+/* ── Fila principal ── */
+.main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.fecha {
+  font-size: 11px;
+  color: var(--text-tertiary);
+}
+
+.concepto {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.monto {
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.badge {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+
+.badgeCredito {
+  background: #1d9e7515;
+  color: #1d9e75;
+}
+
+.badgeDebito {
+  background: #d85a3015;
+  color: #d85a30;
+}
+
+/* ── Campos opcionales ── */
+.extra {
+  border-top: 0.5px solid var(--border);
+  padding-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.extraRow {
+  display: flex;
+  gap: 8px;
+  font-size: 12px;
+  align-items: baseline;
+}
+
+.extraLabel {
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+  min-width: 110px;
+}
+
+.extraValor {
+  color: var(--text-secondary);
+  word-break: break-word;
+}
