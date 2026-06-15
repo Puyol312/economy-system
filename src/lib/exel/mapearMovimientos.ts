@@ -17,7 +17,28 @@ const parsearFecha = (fecha: string): string => {
   const [mm, dd, aaaa] = fecha.split("/");
   return `${aaaa}-${mm.padStart(2, "0")}-${dd.padStart(2, "0")}`;
 };
-
+/**
+ * esFechaValida
+ *
+ * \Valida que la fecha tenga el formato MM/DD/AAAA y que no este vacia.
+ * Si no es una cadena o no tiene el formato correcto, devuelve false.
+ *
+ * @param fecha - Fecha en formato MM/DD/AAAA. Ej: "04/01/2026"
+ * @returns boolean indicando si la fecha es valida o no.
+ *
+ * @example
+ * esFechaValida("04/01/2026") // true
+ * esFechaValida("12/31/2026") // true
+ * esFechaValida("2026-04-01") // false
+ * esFechaValida("")             // false
+ * esFechaValida(null)           // false
+ * esFechaValida(undefined)      // false
+ */
+const esFechaValida = (fecha: unknown): fecha is string => {
+  if (typeof fecha !== "string") return false;
+  const partes = fecha.split("/");
+  return partes.length === 3 && partes.every(p => p.length > 0);
+};
 /**
  * mapearMovimientos
  *
@@ -53,24 +74,54 @@ const parsearFecha = (fecha: string): string => {
 export const mapearMovimientos = (rows: RowExcel[]): Movimiento[] => {
   return rows
     .map((row) => {
-      const credito = Number(row.CREDITO) || 0;
-      const debito  = Number(row.DEBITO)  || 0;
+
+      if (!esFechaValida(row.Fecha)) return null;
+      if (typeof row.Asunto !== "string" || !row.Asunto.trim()) return null;
+
+      const credito = Number(row["Crédito"]) || 0;
+      const debito = Number(row["Débito"]) || 0;
+      
+      const nroDoc =
+				(
+					typeof row["Número de documento"] === "string" &&
+					row["Número de documento"].trim()
+				) ?
+					row["Número de documento"].trim()
+				:	undefined;
+			const desc =
+				typeof row["Descripción"] === "string" && row["Descripción"].trim() ?
+					row["Descripción"].trim()
+				:	undefined;
+
+			const asOficial =
+				(
+					typeof row["Asunto Oficial"] === "string" &&
+					row["Asunto Oficial"].trim()
+				) ?
+					row["Asunto Oficial"].trim()
+				:	undefined;
 
       if (credito > 0) {
         return {
-          dia:      parsearFecha(row.FECHA),
-          concepto: row.ASUNTO,
+          dia:      parsearFecha(row.Fecha),
+          concepto: row.Asunto,
           monto:    credito,
-          tipo:     "credito" as const,
+          tipo: "credito" as const,
+          ...(nroDoc    && { nroDocumento:  nroDoc    }),
+          ...(desc      && { descripcion:   desc      }),
+          ...(asOficial && { asuntoOficial: asOficial }),
         };
       }
 
       if (debito > 0) {
         return {
-          dia:      parsearFecha(row.FECHA),
-          concepto: row.ASUNTO,
+          dia:      parsearFecha(row.Fecha),
+          concepto: row.Asunto,
           monto:    debito,
-          tipo:     "debito" as const,
+          tipo: "debito" as const,
+          ...(nroDoc    && { nroDocumento:  nroDoc    }),
+          ...(desc      && { descripcion:   desc      }),
+          ...(asOficial && { asuntoOficial: asOficial }),
         };
       }
 
