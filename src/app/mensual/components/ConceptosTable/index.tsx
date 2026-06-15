@@ -1,3 +1,6 @@
+import { useState } from "react";
+import type { Movimiento } from "@/types";
+import ConceptoModal from "../ConceptoModal";
 import styles from "./ConceptosTable.module.css";
 
 /**
@@ -17,6 +20,15 @@ export interface ConceptosTableProps {
    * @example [["Alquiler", 18000], ["Supermercado", 8000]]
    */
   debitos: [string, number][];
+    /**
+   * Movimientos del mes seleccionado, sin agrupar.
+   * Proviene de `movimientosPorMes[mes]`.
+   * @example [
+   *   { id: 1, fecha: "2024-06-01", tipo: "credito", concepto: "Sueldo", monto: 50000 },
+   *   { id: 2, fecha: "2024-06-05", tipo: "debito", concepto: "Alquiler", monto: 18000 },
+   * ]
+   */
+  movimientosMes: Movimiento[];
 }
 
 /**
@@ -42,11 +54,13 @@ function TablaConceptos({
   datos,
   colorClass,
   emptyMessage,
+  onConceptoClick
 }: {
   titulo: string;
   datos: [string, number][];
   colorClass: string;
   emptyMessage: string;
+  onConceptoClick: (concepto: string) => void;
 }) {
   return (
     <div className={styles.tableWrapper}>
@@ -62,13 +76,15 @@ function TablaConceptos({
         <tbody>
           {datos.length === 0 ? (
             <tr>
-              <td colSpan={3} className={styles.empty}>
-                {emptyMessage}
-              </td>
+              <td colSpan={3} className={styles.empty}>{emptyMessage}</td>
             </tr>
           ) : (
             datos.map(([concepto, monto], i) => (
-              <tr key={concepto} className={styles.row}>
+              <tr
+                key={concepto}
+                className={`${styles.row} ${styles.rowClickable}`}
+                onClick={() => onConceptoClick(concepto)}
+              >
                 <td className={styles.tdNum}>{i + 1}</td>
                 <td className={styles.tdConcepto}>{concepto}</td>
                 <td className={`${styles.tdMonto} ${colorClass}`}>
@@ -101,10 +117,8 @@ function TablaConceptos({
  * <ConceptosTable creditos={creditos} debitos={debitos} />
  * ```
  */
-export default function ConceptosTable({
-  creditos,
-  debitos,
-}: ConceptosTableProps) {
+export default function ConceptosTable({ creditos, debitos, movimientosMes }: ConceptosTableProps) {
+  const [conceptoSeleccionado, setConceptoSeleccionado] = useState<string | null>(null);
   return (
     <div className={styles.wrapper}>
       <p className={styles.title}>Conceptos del mes</p>
@@ -115,6 +129,7 @@ export default function ConceptosTable({
           datos={creditos}
           colorClass={styles.credito}
           emptyMessage="Sin créditos este mes"
+          onConceptoClick={setConceptoSeleccionado}
         />
 
         <div className={styles.divider} />
@@ -124,8 +139,15 @@ export default function ConceptosTable({
           datos={debitos}
           colorClass={styles.debito}
           emptyMessage="Sin débitos este mes"
+          onConceptoClick={setConceptoSeleccionado}
         />
       </div>
+      
+      <ConceptoModal
+        concepto={conceptoSeleccionado}
+        movimientosMes={movimientosMes}
+        onClose={() => setConceptoSeleccionado(null)}
+      />
     </div>
   );
 }

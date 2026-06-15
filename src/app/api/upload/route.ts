@@ -70,8 +70,6 @@ export async function POST(req: NextRequest) {
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
     const { hojas, movimientosPorHoja } = parseExcel(buffer);
-    console.log("Hojas detectadas:", hojas);
-    console.log("Movimientos por hoja:", movimientosPorHoja);
     const hojasFiltradas = hojas.filter(
       (h) => h.toLowerCase() !== "admin"
     );
@@ -80,8 +78,6 @@ export async function POST(req: NextRequest) {
 				([hoja]) => hoja.toLowerCase() !== "admin",
 			),
     );
-    console.log("Hojas filtradas:", hojasFiltradas);
-    console.log("Movimientos filtrados por hoja:", movimientosFiltrados);
     return NextResponse.json({
       hojas: hojasFiltradas,
       movimientosPorHoja: movimientosFiltrados
