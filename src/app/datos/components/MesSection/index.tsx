@@ -1,7 +1,7 @@
 "use client";
 
 import type { Movimiento } from "@/types";
-import MovimientoCard from "../MovimientoCard";
+import MovimientoCard from "@/components/MovimientoCard";
 import styles from "./MesSection.module.css";
 import { useState } from "react";
 

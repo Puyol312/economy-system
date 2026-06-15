@@ -23,7 +23,7 @@
 
 .divider {
   background: var(--border);
-  margin: 0;
+  width: 0.5px;
 }
 
 .tableTitle {
@@ -138,4 +138,12 @@
   .divider {
     display: none;
   }
+}
+
+.rowClickable {
+  cursor: pointer;
+}
+
+.rowClickable:hover {
+  background: var(--surface);
 }

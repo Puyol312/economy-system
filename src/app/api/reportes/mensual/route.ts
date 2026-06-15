@@ -26,7 +26,8 @@ export interface ReporteMensualResponse {
   /** Saldo acumulado al cierre del mes seleccionado. */
   saldoAlCierre:   number;
   creditos:        [string, number][];
-  debitos:         [string, number][];
+  debitos: [string, number][];
+  movimientosMes: Movimiento[];
 }
 
 /**
@@ -104,6 +105,7 @@ export async function POST(req: NextRequest) {
     saldoAlCierre,
     creditos,
     debitos,
+    movimientosMes
   };
 
   return NextResponse.json(response);
