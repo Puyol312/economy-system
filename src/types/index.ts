@@ -3,10 +3,13 @@
  * Las columnas esperadas son: DIA, CONCEPTO, DEBITO, CREDITO.
  */
 export type RowExcel = {
-  FECHA: string;
-  ASUNTO: string;
-  DEBITO?: number;
-  CREDITO?: number;
+  Fecha: unknown;
+  Asunto: unknown;
+  "Débito"?: unknown;
+  "Crédito"?: unknown;
+  "Número de documento"?:  unknown;
+  "Descripción"?:          unknown;
+  "Asunto Oficial"?:       unknown;
 };
 
 /**
@@ -18,4 +21,7 @@ export type Movimiento = {
   concepto: string;
   monto: number;
   tipo: "credito" | "debito";
+  nroDocumento?:   string;
+  descripcion?:    string;
+  asuntoOficial?:  string;
 };
