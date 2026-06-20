@@ -134,6 +134,7 @@ export default function MensualPage() {
           <ConceptosTable
             creditos={reporte.creditos}
             debitos={reporte.debitos}
+            movimientosMes={reporte.movimientosMes}
           />
         </div>
       </div>
