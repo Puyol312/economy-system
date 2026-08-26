@@ -1,9 +1,8 @@
 import test from "ava";
-import { mapearMovimientos } from "./mapearMovimientos";
+import { mapearMovimientos } from "./mapExcelRowsToMovimientos";
 import type { RowExcel } from "@/types";
 
 // ─── Casos base ───────────────────────────────────────────────────────────────
-
 test("mapea una fila con crédito correctamente", (t) => {
   const rows: RowExcel[] = [
     { Fecha: "04/01/2026", Asunto: "Sueldo", Crédito: 50000 },
