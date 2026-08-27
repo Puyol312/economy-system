@@ -1,112 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Movimiento } from "@/types";
-import {
-  calcularBalance,
-  calcularBalancePorDia,
-  obtenerTotalesPorDia,
-  sumarTotales,
-  agruparPorConcepto
-} from "@/controllers/SingleMonthController";
-import { agruparMovimientosPorMes, calcularSaldoAcumulado } from "@/controllers/MultiMonthController";
 
-/**
- * ReporteMensualResponse
- *
- * Estructura del JSON que devuelve este endpoint.
- */
-export interface ReporteMensualResponse {
-  meses:           string[];
-  mes:             string;
-  balancePorDia:   Record<string, number>;
-  creditosPorDia:  Record<string, number>;
-  debitosPorDia:   Record<string, number>;
-  totalCreditos:   number;
-  totalDebitos:    number;
-  balanceMes:      number;
-  /** Saldo acumulado al cierre del mes seleccionado. */
-  saldoAlCierre:   number;
-  creditos:        [string, number][];
-  debitos: [string, number][];
-  movimientosMes: Movimiento[];
-}
+import { generarReporteMensual } from "@/services/reports/generateMonthlyReport";
 
-/**
- * POST /api/reportes/mensual
- *
- * Recibe los movimientos de una hoja y el mes a analizar en el body.
- * Si `mes` no se provee o no existe, usa el primer mes disponible.
- *
- * Body: `{ movimientos: Movimiento[], mes?: string }`
- *
- * Respuestas:
- * - `200` → `ReporteMensualResponse`
- * - `400` → `{ message: string }` si falta el body o los movimientos.
- * - `404` → `{ message: string }` si no hay meses disponibles.
- */
 export async function POST(req: NextRequest) {
-  let body: { movimientos?: Movimiento[]; mes?: string };
-
+  let body: {
+    movimientos?: Movimiento[];
+    mes?: string;
+  };
   try {
     body = await req.json();
   } catch {
     return NextResponse.json(
       { message: "El cuerpo de la solicitud no es válido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   const { movimientos, mes: mesParam } = body;
-  if (!movimientos || !Array.isArray(movimientos)) {
+
+  if (!Array.isArray(movimientos)) {
     return NextResponse.json(
       { message: "El campo 'movimientos' es requerido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
-  // ── Meses disponibles ─────────────────────────────────────────
-  const movimientosPorMes = agruparMovimientosPorMes(movimientos);
-  const meses             = Object.keys(movimientosPorMes).sort();
-  if (meses.length === 0) {
+  const response = generarReporteMensual(
+    movimientos,
+    mesParam,
+  );
+
+  if (!response) {
     return NextResponse.json(
       { message: "No hay meses disponibles en los datos." },
-      { status: 404 }
+      { status: 404 },
     );
   }
-
-  const mes = mesParam && movimientosPorMes[mesParam] ? mesParam : meses[0];
-
-  // ── Cálculos del mes ──────────────────────────────────────────
-  const movimientosMes = movimientosPorMes[mes] ?? [];
-
-  const balancePorDia  = calcularBalancePorDia(movimientosMes);
-  const creditosPorDia = obtenerTotalesPorDia(movimientosMes, "credito");
-  const debitosPorDia  = obtenerTotalesPorDia(movimientosMes, "debito");
-
-  const totalCreditos  = sumarTotales(creditosPorDia);
-  const totalDebitos   = sumarTotales(debitosPorDia);
-  const balanceMes     = calcularBalance(movimientosMes);
-
-  const creditos       = agruparPorConcepto(movimientosMes, "credito");
-  const debitos        = agruparPorConcepto(movimientosMes, "debito");
-
-  // Saldo acumulado al cierre del mes seleccionado
-  const saldoAcumuladoPorMes = calcularSaldoAcumulado(movimientos);
-  const saldoAlCierre        = saldoAcumuladoPorMes[mes] ?? 0;
-
-  const response: ReporteMensualResponse = {
-    meses,
-    mes,
-    balancePorDia,
-    creditosPorDia,
-    debitosPorDia,
-    totalCreditos,
-    totalDebitos,
-    balanceMes,
-    saldoAlCierre,
-    creditos,
-    debitos,
-    movimientosMes
-  };
 
   return NextResponse.json(response);
 }
