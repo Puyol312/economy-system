@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useExcel } from "@/context/ExcelContext";
-import type { ReporteAnualResponse } from "@/app/api/reportes/anual/route";
+import type { ReporteAnualResponseDTO } from "@/types";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import BalanceAnualChart from "./components/BalanceAnualChart";
@@ -13,7 +13,7 @@ import styles from "./page.module.css";
 export default function AnualPage() {
   const { hojaActiva, movimientosPorHoja } = useExcel();
 
-  const [reporte, setReporte]     = useState<ReporteAnualResponse | null>(null);
+  const [reporte, setReporte]     = useState<ReporteAnualResponseDTO | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export default function AnualPage() {
           throw new Error(body.message ?? "Error al obtener el reporte.");
         }
 
-        const data: ReporteAnualResponse = await res.json();
+        const data: ReporteAnualResponseDTO = await res.json();
         setReporte(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido.");

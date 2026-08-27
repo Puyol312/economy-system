@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useExcel } from "@/context/ExcelContext";
-import type { ReporteDatosResponse } from "@/app/api/reportes/datos/route";
+import type { ReporteDatosResponseDTO } from "@/types";
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import MesSection from "./components/MesSection";
@@ -23,7 +23,7 @@ import styles from "./page.module.css";
 export default function DatosPage() {
   const { hojaActiva, movimientosPorHoja } = useExcel();
 
-  const [reporte, setReporte]     = useState<ReporteDatosResponse | null>(null);
+  const [reporte, setReporte]     = useState<ReporteDatosResponseDTO | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError]         = useState<string | null>(null);
 
@@ -49,7 +49,7 @@ export default function DatosPage() {
           throw new Error(body.message ?? "Error al obtener los datos.");
         }
 
-        const data: ReporteDatosResponse = await res.json();
+        const data: ReporteDatosResponseDTO = await res.json();
         setReporte(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "Error desconocido.");
