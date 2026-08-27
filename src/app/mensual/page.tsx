@@ -1,64 +1,22 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useExcel } from "@/context/ExcelContext";
-import type { ReporteMensualResponse } from "@/app/api/reportes/mensual/route";
+import { useMonthlyReport } from "@/hooks/useMonthlyReport";
+
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
+
 import MesesSidebar from "./components/MesesSidebar";
 import BalanceDiarioChart from "./components/BalanceDiarioChart";
 import TotalesPorDiaChart from "./components/TotalesPorDiaChart";
 import ResumenMensual from "./components/ResumenMensual";
 import ConceptosTable from "./components/ConceptosTable";
+
 import styles from "./page.module.css";
 
 export default function MensualPage() {
-  const { hojaActiva, movimientosPorHoja } = useExcel();
+  const { reporte, mesActivo, setMesActivo, isLoading, error, hasData } = useMonthlyReport();
 
-  const [reporte, setReporte]     = useState<ReporteMensualResponse | null>(null);
-  const [mesActivo, setMesActivo] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!hojaActiva || !movimientosPorHoja) return;
-
-    const movimientos = movimientosPorHoja[hojaActiva];
-    if (!movimientos) return;
-
-    const fetchReporte = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const res = await fetch("/api/reportes/mensual", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            movimientos,
-            ...(mesActivo ? { mes: mesActivo } : {}),
-          }),
-        });
-
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.message ?? "Error al obtener el reporte.");
-        }
-
-        const data: ReporteMensualResponse = await res.json();
-        setMesActivo(data.mes);
-        setReporte(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchReporte();
-  }, [hojaActiva, movimientosPorHoja, mesActivo]);
-
-  if (!hojaActiva) {
+  if (!hasData) {
     return (
       <EmptyState
         title="Sin datos cargados"
