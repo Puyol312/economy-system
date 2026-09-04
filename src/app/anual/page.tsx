@@ -1,57 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useExcel } from "@/context/ExcelContext";
 import type { ReporteAnualResponseDTO } from "@/types";
+
+import { useApiReport } from "@/hooks/useApiReport";
+
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
 import BalanceAnualChart from "./components/BalanceAnualChart";
 import TotalesPorMesChart from "./components/TotalesPorMesChart";
 import ResumenAnual from "./components/ResumenAnual";
+
 import styles from "./page.module.css";
 
 export default function AnualPage() {
-  const { hojaActiva, movimientosPorHoja } = useExcel();
+  const { reporte, isLoading, error, hasData } = useApiReport<ReporteAnualResponseDTO>("/api/reportes/anual");
 
-  const [reporte, setReporte]     = useState<ReporteAnualResponseDTO | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError]         = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!hojaActiva || !movimientosPorHoja) return;
-
-    const movimientos = movimientosPorHoja[hojaActiva];
-    if (!movimientos) return;
-
-    const fetchReporte = async () => {
-      setIsLoading(true);
-      setError(null);
-
-      try {
-        const res = await fetch("/api/reportes/anual", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ movimientos }),
-        });
-
-        if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.message ?? "Error al obtener el reporte.");
-        }
-
-        const data: ReporteAnualResponseDTO = await res.json();
-        setReporte(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Error desconocido.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchReporte();
-  }, [hojaActiva, movimientosPorHoja]);
-
-  if (!hojaActiva) {
+  if (!hasData) {
     return (
       <EmptyState
         title="Sin datos cargados"
