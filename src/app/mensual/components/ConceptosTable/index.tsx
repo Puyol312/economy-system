@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Movimiento } from "@/types";
 import ConceptoModal from "../ConceptoModal";
 import styles from "./ConceptosTable.module.css";
+import { formatearMoneda } from "@/lib/format";
 
 /**
  * ConceptosTableProps
@@ -30,17 +31,6 @@ export interface ConceptosTableProps {
    */
   movimientosMes: Movimiento[];
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * TablaConceptos

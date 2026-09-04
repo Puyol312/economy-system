@@ -11,6 +11,7 @@ import {
   ReferenceLine,
 } from "recharts";
 import styles from "./BalanceDiarioChart.module.css";
+import { extraerDia, formatearMoneda, formatearCompacto } from "@/lib/format";
 
 /**
  * Entrada de dato para el gráfico.
@@ -40,25 +41,6 @@ interface CustomTooltipProps {
   payload?: { value?: number }[];
   label?: string;
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
-
-/**
- * Extrae el día del mes de una fecha "YYYY-MM-DD".
- * @example "2026-04-15" → "15"
- */
-const extraerDia = (fecha: string): string => {
-  return fecha.split("-")[2] ?? fecha;
-};
 
 /**
  * Tooltip personalizado para el gráfico de balance diario.
@@ -144,12 +126,7 @@ export default function BalanceDiarioChart({
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 11, fill: "var(--text-secondary)" }}
-              tickFormatter={(v) =>
-                new Intl.NumberFormat("es-AR", {
-                  notation: "compact",
-                  compactDisplay: "short",
-                }).format(v)
-              }
+              tickFormatter={formatearCompacto}
               width={52}
             />
             <Tooltip

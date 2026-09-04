@@ -2,6 +2,7 @@
 
 import type { Movimiento } from "@/types";
 import styles from "./MovimientoCard.module.css";
+import { formatearMoneda } from "@/lib/format";
 
 /**
  * MovimientoCardProps
@@ -9,17 +10,6 @@ import styles from "./MovimientoCard.module.css";
 export interface MovimientoCardProps {
   movimiento: Movimiento;
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * Formatea una fecha "AAAA-MM-DD" a "DD/MM/AAAA".

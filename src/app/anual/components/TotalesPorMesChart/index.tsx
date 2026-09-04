@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import styles from "./TotalesPorMesChart.module.css";
+import { formatearMoneda, formatearCompacto, MESES_CORTOS } from "@/lib/format";
 
 /**
  * Entrada de dato para el gráfico.
@@ -47,13 +48,6 @@ interface CustomTooltipProps {
   label?: string;
 }
 
-/** Nombres cortos de los meses para el eje X */
-const MESES_CORTOS: Record<string, string> = {
-  "01": "Ene", "02": "Feb", "03": "Mar", "04": "Abr",
-  "05": "May", "06": "Jun", "07": "Jul", "08": "Ago",
-  "09": "Sep", "10": "Oct", "11": "Nov", "12": "Dic",
-};
-
 /** Colores por tipo */
 const COLORES = {
   credito: { stroke: "#1D9E75", fill: "#1D9E7520" },
@@ -65,17 +59,6 @@ const TITULOS = {
   credito: "Créditos por mes",
   debito:  "Débitos por mes",
 };
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * Tooltip personalizado para el gráfico de totales.
@@ -166,12 +149,7 @@ export default function TotalesPorMesChart({
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 10, fill: "var(--text-secondary)" }}
-              tickFormatter={(v) =>
-                new Intl.NumberFormat("es-AR", {
-                  notation: "compact",
-                  compactDisplay: "short",
-                }).format(v)
-              }
+              tickFormatter={formatearCompacto}
               width={48}
             />
             <Tooltip

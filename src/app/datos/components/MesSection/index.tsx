@@ -4,6 +4,7 @@ import type { Movimiento } from "@/types";
 import MovimientoCard from "@/components/MovimientoCard";
 import styles from "./MesSection.module.css";
 import { useState } from "react";
+import { formatearMes } from "@/lib/format";
 
 /**
  * MesSectionProps
@@ -20,21 +21,6 @@ export interface MesSectionProps {
    */
   movimientos: Movimiento[];
 }
-
-/**
- * Convierte un mes "YYYY-MM" a un string legible capitalizado.
- * @example "2026-04" → "Abril 2026"
- */
-const formatearMes = (mes: string): string => {
-  const [anio, mm] = mes.split("-");
-  const fecha = new Date(Number(anio), Number(mm) - 1, 1);
-  const label = fecha.toLocaleDateString("es-AR", {
-    month: "long",
-    year: "numeric",
-  });
-  return label.charAt(0).toUpperCase() + label.slice(1);
-};
-
 /**
  * MesSection
  *

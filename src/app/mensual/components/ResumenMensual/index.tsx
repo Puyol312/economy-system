@@ -1,4 +1,5 @@
 import styles from "./ResumenMensual.module.css";
+import { formatearMoneda } from "@/lib/format";
 
 export interface ResumenMensualProps {
   totalCreditos: number;
@@ -6,13 +7,6 @@ export interface ResumenMensualProps {
   balanceMes:    number;
   saldoAlCierre: number;
 }
-
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * ResumenMensual

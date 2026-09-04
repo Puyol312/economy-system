@@ -10,6 +10,7 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import styles from "./TotalesPorDiaChart.module.css";
+import { formatearMoneda, extraerDia, formatearCompacto } from "@/lib/format";
 
 /**
  * Entrada de dato para el gráfico.
@@ -58,23 +59,6 @@ const TITULOS = {
   credito: "Créditos por día",
   debito:  "Débitos por día",
 };
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
-
-/**
- * Extrae el número de día de una fecha "YYYY-MM-DD".
- * @example "2026-04-15" → "15"
- */
-const extraerDia = (fecha: string): string => fecha.split("-")[2] ?? fecha;
 
 /**
  * Tooltip personalizado para el gráfico de totales por día.
@@ -156,12 +140,7 @@ export default function TotalesPorDiaChart({
               axisLine={false}
               tickLine={false}
               tick={{ fontSize: 10, fill: "var(--text-secondary)" }}
-              tickFormatter={(v) =>
-                new Intl.NumberFormat("es-AR", {
-                  notation: "compact",
-                  compactDisplay: "short",
-                }).format(v)
-              }
+              tickFormatter={formatearCompacto}
               width={48}
             />
             <Tooltip

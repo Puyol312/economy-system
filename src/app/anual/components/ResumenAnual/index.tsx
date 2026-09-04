@@ -1,3 +1,4 @@
+import { formatearMes, formatearMoneda } from "@/lib/format";
 import styles from "./ResumenAnual.module.css";
 
 /**
@@ -29,27 +30,6 @@ export interface ResumenAnualProps {
    */
   mejorMes: string;
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
-
-/**
- * Convierte un mes en formato "YYYY-MM" a un string legible.
- * @example "2026-04" → "Abril 2026"
- */
-const formatearMes = (mes: string): string => {
-  const [anio, mm] = mes.split("-");
-  const fecha = new Date(Number(anio), Number(mm) - 1, 1);
-  return fecha.toLocaleDateString("es-AR", { month: "long", year: "numeric" });
-};
 
 /**
  * ResumenAnual
