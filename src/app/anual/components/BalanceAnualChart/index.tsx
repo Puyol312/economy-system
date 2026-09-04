@@ -14,44 +14,26 @@ import {
 } from "recharts";
 import styles from "./BalanceAnualChart.module.css";
 import { formatearMoneda, formatearCompacto, MESES_CORTOS } from "@/lib/format";
-/**
- * Entrada de dato para el gráfico.
- */
+
 interface BalanceMesData {
   mes:            string;
   balance:        number;
   saldoAcumulado: number;
 }
 
-/**
- * BalanceAnualChartProps
- */
 export interface BalanceAnualChartProps {
-  /**
-   * Record de balance por mes proveniente de `calcularBalancePorMes`.
-   * @example { "2026-01": 30000, "2026-02": -5000 }
-   */
+  /** Balance por mes proveniente de `calcularBalancePorMes`. */
   balancePorMes: Record<string, number>;
-
-  /**
-   * Record de saldo acumulado por mes proveniente de `calcularSaldoAcumulado`.
-   * @example { "2026-01": 30000, "2026-02": 25000 }
-   */
+  /** Saldo acumulado por mes proveniente de `calcularSaldoAcumulado`. */
   saldoAcumulado: Record<string, number>;
 }
 
-/**
- * Props del tooltip personalizado.
- */
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { value?: number; name?: string; color?: string }[];
   label?: string;
 }
 
-/**
- * Tooltip personalizado para el gráfico combinado.
- */
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
@@ -76,20 +58,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 /**
  * BalanceAnualChart
  *
- * Gráfico combinado que muestra:
- * - Barras: balance neto mensual (verde positivo, rojo negativo).
- * - Línea: saldo acumulado mes a mes en violeta.
- *
- * Recibe directamente los resultados de `calcularBalancePorMes`
- * y `calcularSaldoAcumulado` del endpoint `/api/reportes/anual`.
- *
- * @example
- * ```tsx
- * <BalanceAnualChart
- *   balancePorMes={reporte.balancePorMes}
- *   saldoAcumulado={reporte.saldoAcumulado}
- * />
- * ```
+ * Gráfico combinado de `/anual`: barras con el balance neto mensual
+ * (verde positivo, rojo negativo) y una línea con el saldo acumulado.
  */
 export default function BalanceAnualChart({
   balancePorMes,

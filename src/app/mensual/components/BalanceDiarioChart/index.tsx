@@ -11,40 +11,24 @@ import {
   ReferenceLine,
 } from "recharts";
 import styles from "./BalanceDiarioChart.module.css";
-import { extraerDia, formatearMoneda, formatearCompacto } from "@/lib/format";
+import { formatearMoneda, extraerDia, formatearCompacto } from "@/lib/format";
 
-/**
- * Entrada de dato para el gráfico.
- * Se construye a partir del resultado de `calcularBalancePorDia`.
- */
 interface BalanceDiaData {
   dia: string;
   balance: number;
 }
 
-/**
- * BalanceDiarioChartProps
- */
 export interface BalanceDiarioChartProps {
-  /**
-   * Record de balance por día proveniente de `calcularBalancePorDia`.
-   * @example { "2026-04-01": 32000, "2026-04-02": -3000 }
-   */
+  /** Balance por día proveniente de `calcularBalancePorDia`. */
   balancePorDia: Record<string, number>;
 }
 
-/**
- * Props del tooltip personalizado.
- */
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { value?: number }[];
   label?: string;
 }
 
-/**
- * Tooltip personalizado para el gráfico de balance diario.
- */
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
@@ -64,23 +48,8 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
 /**
  * BalanceDiarioChart
  *
- * Gráfico de área principal de la página `/mensual`.
- * Muestra la evolución del balance día a día dentro del mes seleccionado.
- *
- * Incluye una línea de referencia en 0 para visualizar fácilmente
- * los días positivos y negativos.
- *
- * Recibe directamente el resultado de `calcularBalancePorDia` del
- * `SingleMonthController`.
- *
- * @example
- * ```tsx
- * // app/mensual/page.tsx
- * const movimientosMes = agruparMovimientosPorMes(data)[mesActivo] ?? [];
- * const balancePorDia  = calcularBalancePorDia(movimientosMes);
- *
- * <BalanceDiarioChart balancePorDia={balancePorDia} />
- * ```
+ * Gráfico de área principal de la página `/mensual`: evolución del
+ * balance día a día del mes seleccionado, con línea de referencia en 0.
  */
 export default function BalanceDiarioChart({
   balancePorDia,

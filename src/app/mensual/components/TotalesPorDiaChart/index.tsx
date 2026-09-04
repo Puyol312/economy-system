@@ -12,35 +12,18 @@ import {
 import styles from "./TotalesPorDiaChart.module.css";
 import { formatearMoneda, extraerDia, formatearCompacto } from "@/lib/format";
 
-/**
- * Entrada de dato para el gráfico.
- * Se construye a partir del resultado de `obtenerTotalesPorDia`.
- */
 interface TotalDiaData {
   dia: string;
   total: number;
 }
 
-/**
- * TotalesPorDiaChartProps
- */
 export interface TotalesPorDiaChartProps {
-  /**
-   * Record de totales por día proveniente de `obtenerTotalesPorDia`.
-   * @example { "2026-04-01": 50000, "2026-04-05": 10000 }
-   */
+  /** Totales por día proveniente de `obtenerTotalesPorDia`. */
   totalesPorDia: Record<string, number>;
-
-  /**
-   * Tipo de movimiento que representa el gráfico.
-   * Define el título y el color de las barras.
-   */
+  /** Define el título y el color de las barras. */
   tipo: "credito" | "debito";
 }
 
-/**
- * Props del tooltip personalizado.
- */
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { value?: number }[];
@@ -60,9 +43,6 @@ const TITULOS = {
   debito:  "Débitos por día",
 };
 
-/**
- * Tooltip personalizado para el gráfico de totales por día.
- */
 function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
@@ -81,25 +61,9 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
 /**
  * TotalesPorDiaChart
  *
- * Gráfico de barras secundario de la página `/mensual`.
- * Muestra los totales diarios de créditos o débitos del mes seleccionado.
- *
- * Es reutilizable: el `tipo` define el color y el título.
- * Se usa dos veces en la página, una para créditos y otra para débitos.
- *
- * Recibe directamente el resultado de `obtenerTotalesPorDia` del
- * `SingleMonthController`.
- *
- * @example
- * ```tsx
- * // app/mensual/page.tsx
- * const movimientosMes  = agruparMovimientosPorMes(data)[mesActivo] ?? [];
- * const creditosPorDia  = obtenerTotalesPorDia(movimientosMes, "credito");
- * const debitosPorDia   = obtenerTotalesPorDia(movimientosMes, "debito");
- *
- * <TotalesPorDiaChart totalesPorDia={creditosPorDia} tipo="credito" />
- * <TotalesPorDiaChart totalesPorDia={debitosPorDia}  tipo="debito" />
- * ```
+ * Gráfico de barras secundario de `/mensual`: totales diarios de
+ * créditos o débitos del mes seleccionado. Se usa dos veces en la
+ * página (una por tipo), que también define el color y el título.
  */
 export default function TotalesPorDiaChart({
   totalesPorDia,

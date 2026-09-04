@@ -12,36 +12,18 @@ import {
 import styles from "./TotalesPorMesChart.module.css";
 import { formatearMoneda, formatearCompacto, MESES_CORTOS } from "@/lib/format";
 
-/**
- * Entrada de dato para el gráfico.
- * Se construye a partir del resultado de `obtenerTotalesPorMes`.
- */
 interface TotalMesData {
   mes: string;
   total: number;
 }
 
-/**
- * TotalesPorMesChartProps
- */
 export interface TotalesPorMesChartProps {
-  /**
-   * Record de totales por mes proveniente de `obtenerTotalesPorMes`.
-   * @example { "2026-01": 60000, "2026-02": 45000 }
-   */
+  /** Totales por mes proveniente de `obtenerTotalesPorMes`. */
   totalesPorMes: Record<string, number>;
-
-  /**
-   * Tipo de movimiento que representa el gráfico.
-   * Define el título y el color del área.
-   */
+  /** Define el título y el color del área. */
   tipo: "credito" | "debito";
 }
 
-/**
- * Props del tooltip personalizado.
- * Se tipan manualmente para evitar incompatibilidades entre versiones de recharts.
- */
 interface CustomTooltipProps {
   active?: boolean;
   payload?: { value?: number }[];
@@ -60,9 +42,6 @@ const TITULOS = {
   debito:  "Débitos por mes",
 };
 
-/**
- * Tooltip personalizado para el gráfico de totales.
- */
 function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps & { tipo: "credito" | "debito" }) {
   if (!active || !payload?.length) return null;
 
@@ -84,24 +63,8 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps & { 
 /**
  * TotalesPorMesChart
  *
- * Gráfico de área que muestra los totales mensuales de créditos o débitos.
- * Es reutilizable: el `tipo` define tanto el color como el título.
- *
- * Recibe directamente el resultado de `obtenerTotalesPorMes` del
- * `MultiMonthController`.
- *
- * Se usa dos veces en `/anual`, una para créditos y otra para débitos,
- * apilados verticalmente en el panel derecho.
- *
- * @example
- * ```tsx
- * // app/anual/page.tsx
- * const creditosPorMes = obtenerTotalesPorMes(data, "credito");
- * const debitosPorMes  = obtenerTotalesPorMes(data, "debito");
- *
- * <TotalesPorMesChart totalesPorMes={creditosPorMes} tipo="credito" />
- * <TotalesPorMesChart totalesPorMes={debitosPorMes}  tipo="debito" />
- * ```
+ * Gráfico de área de `/anual`: totales mensuales de créditos o débitos.
+ * Se usa dos veces (una por tipo), apilados en el panel derecho.
  */
 export default function TotalesPorMesChart({
   totalesPorMes,
