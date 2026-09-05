@@ -20,32 +20,3 @@
   flex: 1;
   min-height: 240px;
 }
-
-/* ── Tooltip ── */
-.tooltip {
-  background: var(--background);
-  border: 0.5px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.tooltipLabel {
-  font-size: 12px;
-  color: var(--text-secondary);
-}
-
-.tooltipValue {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.positivo {
-  color: #1d9e75;
-}
-
-.negativo {
-  color: #d85a30;
-}

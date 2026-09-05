@@ -11,7 +11,8 @@ import {
   ReferenceLine,
 } from "recharts";
 import styles from "./BalanceDiarioChart.module.css";
-import { formatearMoneda, extraerDia, formatearCompacto } from "@/lib/format";
+import { extraerDia, formatearCompacto } from "@/lib/format";
+import ChartTooltip from "@/components/ChartTooltip";
 
 interface BalanceDiaData {
   dia: string;
@@ -19,7 +20,6 @@ interface BalanceDiaData {
 }
 
 export interface BalanceDiarioChartProps {
-  /** Balance por día proveniente de `calcularBalancePorDia`. */
   balancePorDia: Record<string, number>;
 }
 
@@ -33,15 +33,12 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
   const valor = payload[0].value ?? 0;
-  const esPositivo = valor >= 0;
 
   return (
-    <div className={styles.tooltip}>
-      <p className={styles.tooltipLabel}>Día {label}</p>
-      <p className={`${styles.tooltipValue} ${esPositivo ? styles.positivo : styles.negativo}`}>
-        {formatearMoneda(valor)}
-      </p>
-    </div>
+    <ChartTooltip
+      title={`Día ${label}`}
+      lines={[{ value: valor, color: valor >= 0 ? "#1D9E75" : "#D85A30" }]}
+    />
   );
 }
 
@@ -51,9 +48,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  * Gráfico de área principal de la página `/mensual`: evolución del
  * balance día a día del mes seleccionado, con línea de referencia en 0.
  */
-export default function BalanceDiarioChart({
-  balancePorDia,
-}: BalanceDiarioChartProps) {
+export default function BalanceDiarioChart({ balancePorDia }: BalanceDiarioChartProps) {
   const chartData: BalanceDiaData[] = Object.entries(balancePorDia)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dia, balance]) => ({

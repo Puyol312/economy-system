@@ -13,7 +13,8 @@ import {
   Legend,
 } from "recharts";
 import styles from "./BalanceAnualChart.module.css";
-import { formatearMoneda, formatearCompacto, MESES_CORTOS } from "@/lib/format";
+import { formatearCompacto, MESES_CORTOS } from "@/lib/format";
+import ChartTooltip from "@/components/ChartTooltip";
 
 interface BalanceMesData {
   mes:            string;
@@ -22,7 +23,6 @@ interface BalanceMesData {
 }
 
 export interface BalanceAnualChartProps {
-  /** Balance por mes proveniente de `calcularBalancePorMes`. */
   balancePorMes: Record<string, number>;
   /** Saldo acumulado por mes proveniente de `calcularSaldoAcumulado`. */
   saldoAcumulado: Record<string, number>;
@@ -38,20 +38,14 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
   return (
-    <div className={styles.tooltip}>
-      <p className={styles.tooltipLabel}>{label}</p>
-      {payload.map((entry, i) => (
-        <p
-          key={i}
-          className={styles.tooltipValue}
-          style={{ color: entry.color }}
-        >
-          {entry.name === "balance" ? "Balance del mes" : "Saldo acumulado"}
-          {": "}
-          {formatearMoneda(entry.value ?? 0)}
-        </p>
-      ))}
-    </div>
+    <ChartTooltip
+      title={label ?? ""}
+      lines={payload.map((entry) => ({
+        value: entry.value ?? 0,
+        color: entry.color ?? "",
+        label: entry.name === "balance" ? "Balance del mes: " : "Saldo acumulado: ",
+      }))}
+    />
   );
 }
 
@@ -61,10 +55,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  * Gráfico combinado de `/anual`: barras con el balance neto mensual
  * (verde positivo, rojo negativo) y una línea con el saldo acumulado.
  */
-export default function BalanceAnualChart({
-  balancePorMes,
-  saldoAcumulado,
-}: BalanceAnualChartProps) {
+export default function BalanceAnualChart({ balancePorMes, saldoAcumulado }: BalanceAnualChartProps) {
   const chartData: BalanceMesData[] = Object.keys(balancePorMes)
     .sort()
     .map((mes) => {

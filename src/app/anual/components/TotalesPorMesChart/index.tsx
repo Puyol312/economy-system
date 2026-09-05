@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import styles from "./TotalesPorMesChart.module.css";
-import { formatearMoneda, formatearCompacto, MESES_CORTOS } from "@/lib/format";
+import { formatearCompacto, MESES_CORTOS } from "@/lib/format";
+import ChartTooltip from "@/components/ChartTooltip";
 
 interface TotalMesData {
   mes: string;
@@ -18,16 +19,8 @@ interface TotalMesData {
 }
 
 export interface TotalesPorMesChartProps {
-  /** Totales por mes proveniente de `obtenerTotalesPorMes`. */
   totalesPorMes: Record<string, number>;
-  /** Define el título y el color del área. */
   tipo: "credito" | "debito";
-}
-
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: { value?: number }[];
-  label?: string;
 }
 
 /** Colores por tipo */
@@ -42,21 +35,22 @@ const TITULOS = {
   debito:  "Débitos por mes",
 };
 
-function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps & { tipo: "credito" | "debito" }) {
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: { value?: number }[];
+  label?: string;
+  tipo: "credito" | "debito";
+}
+
+function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
-  const valor = payload[0].value ?? 0;
-
   return (
-    <div className={styles.tooltip}>
-      <p className={styles.tooltipLabel}>{label}</p>
-      <p
-        className={styles.tooltipValue}
-        style={{ color: COLORES[tipo].stroke }}
-      >
-        {formatearMoneda(valor)}
-      </p>
-    </div>
+    <ChartTooltip
+      title={label ?? ""}
+      lines={[{ value: payload[0].value ?? 0, color: COLORES[tipo].stroke }]}
+      size="secondary"
+    />
   );
 }
 
@@ -66,10 +60,7 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps & { 
  * Gráfico de área de `/anual`: totales mensuales de créditos o débitos.
  * Se usa dos veces (una por tipo), apilados en el panel derecho.
  */
-export default function TotalesPorMesChart({
-  totalesPorMes,
-  tipo,
-}: TotalesPorMesChartProps) {
+export default function TotalesPorMesChart({ totalesPorMes, tipo }: TotalesPorMesChartProps) {
   const chartData: TotalMesData[] = Object.entries(totalesPorMes)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([mes, total]) => {

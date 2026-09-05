@@ -10,7 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import styles from "./TotalesPorDiaChart.module.css";
-import { formatearMoneda, extraerDia, formatearCompacto } from "@/lib/format";
+import { extraerDia, formatearCompacto } from "@/lib/format";
+import ChartTooltip from "@/components/ChartTooltip";
 
 interface TotalDiaData {
   dia: string;
@@ -18,11 +19,20 @@ interface TotalDiaData {
 }
 
 export interface TotalesPorDiaChartProps {
-  /** Totales por día proveniente de `obtenerTotalesPorDia`. */
   totalesPorDia: Record<string, number>;
   /** Define el título y el color de las barras. */
   tipo: "credito" | "debito";
 }
+
+const COLORES = {
+  credito: "#1D9E75",
+  debito:  "#D85A30",
+};
+
+const TITULOS = {
+  credito: "Créditos por día",
+  debito:  "Débitos por día",
+};
 
 interface CustomTooltipProps {
   active?: boolean;
@@ -31,30 +41,15 @@ interface CustomTooltipProps {
   tipo: "credito" | "debito";
 }
 
-/** Colores por tipo */
-const COLORES = {
-  credito: "#1D9E75",
-  debito:  "#D85A30",
-};
-
-/** Títulos por tipo */
-const TITULOS = {
-  credito: "Créditos por día",
-  debito:  "Débitos por día",
-};
-
 function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
   if (!active || !payload?.length) return null;
 
-  const valor = payload[0].value ?? 0;
-
   return (
-    <div className={styles.tooltip}>
-      <p className={styles.tooltipLabel}>Día {label}</p>
-      <p className={styles.tooltipValue} style={{ color: COLORES[tipo] }}>
-        {formatearMoneda(valor)}
-      </p>
-    </div>
+    <ChartTooltip
+      title={`Día ${label}`}
+      lines={[{ value: payload[0].value ?? 0, color: COLORES[tipo] }]}
+      size="secondary"
+    />
   );
 }
 
@@ -65,10 +60,7 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
  * créditos o débitos del mes seleccionado. Se usa dos veces en la
  * página (una por tipo), que también define el color y el título.
  */
-export default function TotalesPorDiaChart({
-  totalesPorDia,
-  tipo,
-}: TotalesPorDiaChartProps) {
+export default function TotalesPorDiaChart({ totalesPorDia, tipo }: TotalesPorDiaChartProps) {
   const chartData: TotalDiaData[] = Object.entries(totalesPorDia)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dia, total]) => ({
