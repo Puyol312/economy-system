@@ -37,7 +37,7 @@ export default function UploadZone() {
       if (!file.name.endsWith(".xlsx")) return;
       uploadFile(file);
     },
-    [uploadFile]
+    [uploadFile],
   );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,8 +68,20 @@ export default function UploadZone() {
         <div className={styles.fileLoaded}>
           <div className={styles.fileIcon}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path
+                d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              <polyline
+                points="14 2 14 8 20 8"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
             </svg>
           </div>
           <div className={styles.fileInfo}>
@@ -84,8 +96,24 @@ export default function UploadZone() {
             aria-label="Quitar archivo"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-              <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line
+                x1="18"
+                y1="6"
+                x2="6"
+                y2="18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="6"
+                y1="6"
+                x2="18"
+                y2="18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
             Quitar
           </button>
@@ -104,17 +132,52 @@ export default function UploadZone() {
                 >
                   <span className={styles.hojaIcon}>
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                      <rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" strokeWidth="1.5"/>
-                      <line x1="3" y1="9" x2="21" y2="9" stroke="currentColor" strokeWidth="1.5"/>
-                      <line x1="3" y1="15" x2="21" y2="15" stroke="currentColor" strokeWidth="1.5"/>
-                      <line x1="9" y1="9" x2="9" y2="21" stroke="currentColor" strokeWidth="1.5"/>
+                      <rect
+                        x="3"
+                        y="3"
+                        width="18"
+                        height="18"
+                        rx="2"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
+                      <line
+                        x1="3"
+                        y1="9"
+                        x2="21"
+                        y2="9"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
+                      <line
+                        x1="3"
+                        y1="15"
+                        x2="21"
+                        y2="15"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
+                      <line
+                        x1="9"
+                        y1="9"
+                        x2="9"
+                        y2="21"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                      />
                     </svg>
                   </span>
                   <span className={styles.hojaName}>{hoja}</span>
                   {hoja === hojaActiva && (
                     <span className={styles.hojaCheck}>
                       <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-                        <polyline points="20 6 9 17 4 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                        <polyline
+                          points="20 6 9 17 4 12"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                        />
                       </svg>
                     </span>
                   )}
@@ -160,9 +223,29 @@ export default function UploadZone() {
         />
         <div className={styles.uploadIcon}>
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <polyline points="17 8 12 3 7 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+            <path
+              d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <polyline
+              points="17 8 12 3 7 8"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+            <line
+              x1="12"
+              y1="3"
+              x2="12"
+              y2="15"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
           </svg>
         </div>
         <p className={styles.dropText}>

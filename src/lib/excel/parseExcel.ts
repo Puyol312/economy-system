@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { mapearMovimientos } from "./mapearMovimientos";
+import { mapearMovimientos } from "./mapExcelRowsToMovimientos";
 import type { Movimiento, RowExcel } from "@/types";
 
 /**

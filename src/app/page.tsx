@@ -40,7 +40,8 @@ export default function HomePage() {
                 <div>
                   <p className={styles.stepTitle}>Procesamos la data</p>
                   <p className={styles.stepDesc}>
-                    El archivo se envía a la API y los datos quedan disponibles globalmente.
+                    El archivo se envía a la API y los datos quedan disponibles
+                    globalmente.
                   </p>
                 </div>
               </li>
@@ -49,7 +50,8 @@ export default function HomePage() {
                 <div>
                   <p className={styles.stepTitle}>Explorá los reportes</p>
                   <p className={styles.stepDesc}>
-                    Navegá a <strong>Mensual</strong> o <strong>Anual</strong> para ver los resultados.
+                    Navegá a <strong>Mensual</strong> o <strong>Anual</strong> para ver
+                    los resultados.
                   </p>
                 </div>
               </li>
@@ -59,7 +61,9 @@ export default function HomePage() {
           <div className={styles.sidebarSection}>
             <h2 className={styles.sidebarTitle}>Requisitos del archivo</h2>
             <ul className={styles.requirements}>
-              <li>Formato <code>.xlsx</code> únicamente</li>
+              <li>
+                Formato <code>.xlsx</code> únicamente
+              </li>
               <li>Primera fila como encabezados de columna</li>
               <li>Tamaño máximo: 10 MB</li>
             </ul>

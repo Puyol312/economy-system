@@ -4,7 +4,8 @@ import type { Movimiento } from "@/types";
 import MovimientoCard from "@/components/MovimientoCard";
 import styles from "./MesSection.module.css";
 import { useState } from "react";
-
+import { formatearMes, formatearMoneda } from "@/lib/format";
+import { redondearMonto } from "@/lib/money";
 /**
  * MesSectionProps
  */
@@ -20,21 +21,6 @@ export interface MesSectionProps {
    */
   movimientos: Movimiento[];
 }
-
-/**
- * Convierte un mes "YYYY-MM" a un string legible capitalizado.
- * @example "2026-04" → "Abril 2026"
- */
-const formatearMes = (mes: string): string => {
-  const [anio, mm] = mes.split("-");
-  const fecha = new Date(Number(anio), Number(mm) - 1, 1);
-  const label = fecha.toLocaleDateString("es-AR", {
-    month: "long",
-    year: "numeric",
-  });
-  return label.charAt(0).toUpperCase() + label.slice(1);
-};
-
 /**
  * MesSection
  *
@@ -60,13 +46,13 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
     : movimientos.slice(0, LIMITE_INICIAL);
 
   const hayMas = movimientos.length > LIMITE_INICIAL;
-  const totalCreditos = movimientos
-    .filter((m) => m.tipo === "credito")
-    .reduce((acc, m) => acc + m.monto, 0);
+  const totalCreditos = redondearMonto(
+    movimientos.filter((m) => m.tipo === "credito").reduce((acc, m) => acc + m.monto, 0),
+  );
 
-  const totalDebitos = movimientos
-    .filter((m) => m.tipo === "debito")
-    .reduce((acc, m) => acc + m.monto, 0);
+  const totalDebitos = redondearMonto(
+    movimientos.filter((m) => m.tipo === "debito").reduce((acc, m) => acc + m.monto, 0),
+  );
 
   return (
     <section className={styles.section}>
@@ -80,14 +66,16 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
         </div>
         <div className={styles.headerRight}>
           <span className={styles.credito}>
-            +{new Intl.NumberFormat("es-AR", {
+            +
+            {new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
               maximumFractionDigits: 0,
             }).format(totalCreditos)}
           </span>
           <span className={styles.debito}>
-            -{new Intl.NumberFormat("es-AR", {
+            -
+            {new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
               maximumFractionDigits: 0,
@@ -104,13 +92,8 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
       </div>
 
       {hayMas && (
-        <button
-          className={styles.verMas}
-          onClick={() => setVerTodos((prev) => !prev)}
-        >
-          {verTodos
-            ? "Ver menos"
-            : `Ver ${movimientos.length - LIMITE_INICIAL} más`}
+        <button className={styles.verMas} onClick={() => setVerTodos((prev) => !prev)}>
+          {verTodos ? "Ver menos" : `Ver ${movimientos.length - LIMITE_INICIAL} más`}
         </button>
       )}
     </section>

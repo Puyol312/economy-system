@@ -1,15 +1,17 @@
-# 📊 Finance Dashboard
+# Economy System
 
-Aplicación web para visualizar y analizar movimientos financieros a partir de archivos Excel (`.xlsx`). Permite explorar reportes mensuales y anuales de forma interactiva.
+Aplicación web para importar movimientos financieros desde archivos Excel (`.xlsx`) y explorar reportes mensuales y anuales de forma interactiva.
 
 ---
 
 ## Tecnologías
 
-- **Next.js 14** — App Router
+- **Next.js 16** — App Router
+- **React 19**
 - **TypeScript**
 - **Recharts** — gráficos interactivos
 - **CSS Modules** — estilos por componente
+- **AVA** — pruebas automatizadas
 
 ---
 
@@ -20,6 +22,8 @@ src/
 ├── app/
 │   ├── layout.tsx                  # Layout raíz con Navbar y ExcelProvider
 │   ├── page.tsx                    # Homepage — carga del archivo
+│   ├── datos/
+│   │   └── page.tsx                # Vista de datos importados
 │   ├── anual/
 │   │   ├── page.tsx                # Reporte anual
 │   │   └── components/
@@ -38,6 +42,8 @@ src/
 │       ├── upload/
 │       │   └── route.ts            # POST — parsea el Excel
 │       └── reportes/
+│           ├── datos/
+│           │   └── route.ts         # POST — devuelve los datos importados
 │           ├── anual/
 │           │   └── route.ts        # POST — cálculos anuales
 │           └── mensual/
@@ -49,14 +55,10 @@ src/
 │   └── EmptyState/
 ├── context/
 │   └── ExcelContext.tsx            # Estado global del archivo cargado
-├── controllers/
-│   ├── SingleMonthController.ts    # Cálculos de un mes
-│   ├── MultiMonthController.ts     # Cálculos multi-mes
-├── lib/
-│   └── excel/
-│       ├── mapearMovimientos.ts    # Transforma filas crudas a Movimiento[]
-│       └── parseExcel.ts          # Parseo server-side con xlsx
-└── types.ts                        # Tipos globales (Movimiento, RowExcel)
+├── hooks/                          # Hooks para consumir reportes
+├── lib/                            # Utilidades, formato y parseo de Excel
+├── services/                       # Generación de reportes y procesamiento
+└── types/                          # Tipos de dominio y DTOs
 ```
 
 ---
@@ -65,16 +67,19 @@ src/
 
 El archivo `.xlsx` debe tener la siguiente estructura en cada hoja:
 
-| FECHA      | ASUNTO       | DEBITO | CREDITO |
-|------------|--------------|--------|---------|
-| 2026-04-01 | Sueldo       |        | 50000   |
-| 2026-04-02 | Supermercado | 8000   |         |
-| 2026-04-15 | Alquiler     | 20000  |         |
+| Fecha      | Asunto       | Débito | Crédito |
+| ---------- | ------------ | ------ | ------- |
+| 04/01/2026 | Sueldo       |        | 50000   |
+| 04/02/2026 | Supermercado | 8000   |         |
+| 04/15/2026 | Alquiler     | 20000  |         |
 
 - La **primera fila** debe contener los encabezados exactamente como se muestran.
+- La **primera fila** debe contener los encabezados `Fecha`, `Asunto`, `Débito` y `Crédito`.
 - Las fechas deben estar en formato `mm/dd/yyyy`.
-- Cada fila tiene valor en `DEBITO` o en `CREDITO`, nunca en ambos.
-- Se soportan **múltiples hojas** en el mismo archivo.
+- Cada fila debe tener un `Asunto` y un valor positivo en `Débito` o `Crédito`.
+- Las filas con fecha, asunto o importe inválidos se ignoran.
+- También se admiten las columnas opcionales `Número de documento`, `Descripción` y `Asunto Oficial`.
+- Se soportan **múltiples hojas** en el mismo archivo; cada hoja se procesa por separado.
 
 ---
 
@@ -83,7 +88,7 @@ El archivo `.xlsx` debe tener la siguiente estructura en cada hoja:
 ```bash
 # Clonar el repositorio
 git clone https://github.com/Puyol312/economy-system.git
-cd finance-dashboard
+cd economy-system
 
 # Instalar dependencias
 pnpm install
@@ -131,7 +136,7 @@ Páginas /anual y /mensual
 
 **Estado en el cliente** — los movimientos se guardan en el `ExcelContext` (browser) y se mandan en el body de cada request a los endpoints de reportes. Esto permite deployar en plataformas serverless como Vercel sin necesidad de base de datos ni estado en el servidor.
 
-**Controladores puros** — `SingleMonthController` y `MultiMonthController` son funciones puras sin efectos secundarios, reutilizables tanto en el cliente como en el servidor.
+**Servicios de reportes** — la generación de reportes está separada en servicios y funciones de cálculo puras, reutilizables tanto en los Route Handlers como en las pruebas automatizadas.
 
 **CSS Modules** — cada componente tiene su propio archivo `.module.css` para evitar colisiones de estilos y mantener la colocación de estilos junto al componente.
 
@@ -143,7 +148,10 @@ Páginas /anual y /mensual
 pnpm dev        # Desarrollo con hot reload
 pnpm build      # Build de producción
 pnpm start      # Servidor de producción
+pnpm test       # Pruebas automatizadas con AVA
 pnpm lint       # Linting con ESLint
+pnpm format     # Formatear archivos con Prettier
+pnpm format:check # Comprobar el formato
 ```
 
 ---

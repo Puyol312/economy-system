@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./MesesSidebar.module.css";
+import { formatearMes } from "@/lib/format";
 
 /**
  * MesesSidebarProps
@@ -24,20 +25,6 @@ export interface MesesSidebarProps {
    */
   onMesChange: (mes: string) => void;
 }
-
-/**
- * Convierte un mes "YYYY-MM" a un string legible capitalizado.
- * @example "2026-04" → "Abril 2026"
- */
-const formatearMes = (mes: string): string => {
-  const [anio, mm] = mes.split("-");
-  const fecha = new Date(Number(anio), Number(mm) - 1, 1);
-  const label = fecha.toLocaleDateString("es-AR", {
-    month: "long",
-    year: "numeric",
-  });
-  return label.charAt(0).toUpperCase() + label.slice(1);
-};
 
 /**
  * MesesSidebar

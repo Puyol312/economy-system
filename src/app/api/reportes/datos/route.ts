@@ -1,28 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { Movimiento } from "@/types";
-import { agruparMovimientosPorMes } from "@/controllers/MultiMonthController";
-
-/**
- * ReporteDatosResponse
- *
- * Estructura del JSON que devuelve este endpoint.
- * La página `/datos` lo consume para renderizar las cards
- * de movimientos agrupadas por mes.
- */
-export interface ReporteDatosResponse {
-  /**
-   * Meses disponibles ordenados cronológicamente.
-   * @example ["2026-01", "2026-02", "2026-03"]
-   */
-  meses: string[];
-
-  /**
-   * Movimientos agrupados por mes, ordenados cronológicamente
-   * dentro de cada mes.
-   * La clave es el mes en formato "YYYY-MM".
-   */
-  movimientosPorMes: Record<string, Movimiento[]>;
-}
+import { generarReporteDatos } from "@/services/reports/generateDataReport";
 
 /**
  * POST /api/reportes/datos
@@ -54,7 +32,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { message: "El cuerpo de la solicitud no es válido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -63,34 +41,18 @@ export async function POST(req: NextRequest) {
   if (!movimientos || !Array.isArray(movimientos)) {
     return NextResponse.json(
       { message: "El campo 'movimientos' es requerido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (movimientos.length === 0) {
     return NextResponse.json(
       { message: "No hay movimientos disponibles." },
-      { status: 404 }
+      { status: 404 },
     );
   }
 
-  // ── Agrupar y ordenar ─────────────────────────────────────────
-  const agrupados = agruparMovimientosPorMes(movimientos);
-  const meses     = Object.keys(agrupados).sort();
-
-  // Ordenar movimientos dentro de cada mes cronológicamente
-  const movimientosPorMes: Record<string, Movimiento[]> = {};
-
-  for (const mes of meses) {
-    movimientosPorMes[mes] = agrupados[mes].sort((a, b) =>
-      a.dia.localeCompare(b.dia)
-    );
-  }
-
-  const response: ReporteDatosResponse = {
-    meses,
-    movimientosPorMes,
-  };
+  const response = generarReporteDatos(movimientos);
 
   return NextResponse.json(response);
 }

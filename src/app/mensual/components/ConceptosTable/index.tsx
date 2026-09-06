@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Movimiento } from "@/types";
 import ConceptoModal from "../ConceptoModal";
 import styles from "./ConceptosTable.module.css";
+import { formatearMoneda } from "@/lib/format";
 
 /**
  * ConceptosTableProps
@@ -20,7 +21,7 @@ export interface ConceptosTableProps {
    * @example [["Alquiler", 18000], ["Supermercado", 8000]]
    */
   debitos: [string, number][];
-    /**
+  /**
    * Movimientos del mes seleccionado, sin agrupar.
    * Proviene de `movimientosPorMes[mes]`.
    * @example [
@@ -30,17 +31,6 @@ export interface ConceptosTableProps {
    */
   movimientosMes: Movimiento[];
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * TablaConceptos
@@ -54,7 +44,7 @@ function TablaConceptos({
   datos,
   colorClass,
   emptyMessage,
-  onConceptoClick
+  onConceptoClick,
 }: {
   titulo: string;
   datos: [string, number][];
@@ -76,7 +66,9 @@ function TablaConceptos({
         <tbody>
           {datos.length === 0 ? (
             <tr>
-              <td colSpan={3} className={styles.empty}>{emptyMessage}</td>
+              <td colSpan={3} className={styles.empty}>
+                {emptyMessage}
+              </td>
             </tr>
           ) : (
             datos.map(([concepto, monto], i) => (
@@ -117,7 +109,11 @@ function TablaConceptos({
  * <ConceptosTable creditos={creditos} debitos={debitos} />
  * ```
  */
-export default function ConceptosTable({ creditos, debitos, movimientosMes }: ConceptosTableProps) {
+export default function ConceptosTable({
+  creditos,
+  debitos,
+  movimientosMes,
+}: ConceptosTableProps) {
   const [conceptoSeleccionado, setConceptoSeleccionado] = useState<string | null>(null);
   return (
     <div className={styles.wrapper}>
@@ -142,7 +138,7 @@ export default function ConceptosTable({ creditos, debitos, movimientosMes }: Co
           onConceptoClick={setConceptoSeleccionado}
         />
       </div>
-      
+
       <ConceptoModal
         concepto={conceptoSeleccionado}
         movimientosMes={movimientosMes}

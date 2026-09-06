@@ -48,7 +48,9 @@
   border-radius: 8px;
   padding: 8px 18px;
   text-decoration: none;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
 }
 
 .button:hover {

@@ -2,6 +2,7 @@
 
 import type { Movimiento } from "@/types";
 import styles from "./MovimientoCard.module.css";
+import { formatearMoneda } from "@/lib/format";
 
 /**
  * MovimientoCardProps
@@ -9,17 +10,6 @@ import styles from "./MovimientoCard.module.css";
 export interface MovimientoCardProps {
   movimiento: Movimiento;
 }
-
-/**
- * Formatea un número como moneda local sin decimales.
- * @example 50000 → "$50.000"
- */
-const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
-    style: "currency",
-    currency: "ARS",
-    maximumFractionDigits: 0,
-  }).format(valor);
 
 /**
  * Formatea una fecha "AAAA-MM-DD" a "DD/MM/AAAA".
@@ -47,22 +37,15 @@ const formatearFecha = (dia: string): string => {
  * ```
  */
 export default function MovimientoCard({ movimiento }: MovimientoCardProps) {
-  const {
-    dia,
-    concepto,
-    monto,
-    tipo,
-    nroDocumento,
-    descripcion,
-    asuntoOficial,
-  } = movimiento;
+  const { dia, concepto, monto, tipo, nroDocumento, descripcion, asuntoOficial } =
+    movimiento;
 
   const esCredito = tipo === "credito";
 
   // Campos opcionales — solo los que tienen valor
   const camposOpcionales = [
-    nroDocumento  && { label: "Nro. Documento", valor: nroDocumento  },
-    descripcion   && { label: "Descripción",    valor: descripcion   },
+    nroDocumento && { label: "Nro. Documento", valor: nroDocumento },
+    descripcion && { label: "Descripción", valor: descripcion },
     asuntoOficial && { label: "Asunto Oficial", valor: asuntoOficial },
   ].filter(Boolean) as { label: string; valor: string }[];
 
@@ -76,7 +59,9 @@ export default function MovimientoCard({ movimiento }: MovimientoCardProps) {
         </div>
         <div className={styles.right}>
           <span className={styles.monto}>{formatearMoneda(monto)}</span>
-          <span className={`${styles.badge} ${esCredito ? styles.badgeCredito : styles.badgeDebito}`}>
+          <span
+            className={`${styles.badge} ${esCredito ? styles.badgeCredito : styles.badgeDebito}`}
+          >
             {esCredito ? "Crédito" : "Débito"}
           </span>
         </div>

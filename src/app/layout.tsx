@@ -23,11 +23,7 @@ export const metadata: Metadata = {
  * - `Navbar` — barra de navegación persistente.
  * - `main` — área donde cada página inyecta su contenido.
  */
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es">
       <body>
