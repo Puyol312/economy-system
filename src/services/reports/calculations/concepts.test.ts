@@ -4,11 +4,11 @@ import type { Movimiento } from "@/types";
 import { agruparPorConcepto } from "./concepts";
 
 const movimientos: Movimiento[] = [
-  { dia: "2026-04-01", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito"  },
-  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000,  tipo: "debito"  },
-  { dia: "2026-04-05", concepto: "Freelance",    monto: 10000, tipo: "credito" },
-  { dia: "2026-04-05", concepto: "Gym",          monto: 3000,  tipo: "debito"  },
+  { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+  { dia: "2026-04-05", concepto: "Freelance", monto: 10000, tipo: "credito" },
+  { dia: "2026-04-05", concepto: "Gym", monto: 3000, tipo: "debito" },
 ];
 
 // ─── agruparPorConcepto ───────────────────────────────────────────────────────
@@ -36,9 +36,9 @@ test("agruparPorConcepto — agrupa débitos por concepto ordenados de mayor a m
 
 test("agruparPorConcepto — acumula el mismo concepto en múltiples días", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Supermercado", monto: 8000,  tipo: "debito" },
-    { dia: "2026-04-10", concepto: "Supermercado", monto: 5000,  tipo: "debito" },
-    { dia: "2026-04-20", concepto: "Alquiler",     monto: 20000, tipo: "debito" },
+    { dia: "2026-04-01", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+    { dia: "2026-04-10", concepto: "Supermercado", monto: 5000, tipo: "debito" },
+    { dia: "2026-04-20", concepto: "Alquiler", monto: 20000, tipo: "debito" },
   ];
 
   const result = agruparPorConcepto(movs, "debito");

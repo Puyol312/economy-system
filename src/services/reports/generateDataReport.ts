@@ -2,7 +2,9 @@ import type { Movimiento, ReporteDatosResponseDTO } from "@/types";
 
 import { agruparMovimientosPorMes } from "./calculations/monthly";
 
-export const generarReporteDatos = ( movimientos: Movimiento[] ): ReporteDatosResponseDTO => {
+export const generarReporteDatos = (
+  movimientos: Movimiento[],
+): ReporteDatosResponseDTO => {
   const agrupados = agruparMovimientosPorMes(movimientos);
 
   const meses = Object.keys(agrupados).sort();
@@ -10,8 +12,8 @@ export const generarReporteDatos = ( movimientos: Movimiento[] ): ReporteDatosRe
   const movimientosPorMes: Record<string, Movimiento[]> = {};
 
   for (const mes of meses) {
-    movimientosPorMes[mes] = [...agrupados[mes]].sort(
-      (a, b) => a.dia.localeCompare(b.dia),
+    movimientosPorMes[mes] = [...agrupados[mes]].sort((a, b) =>
+      a.dia.localeCompare(b.dia),
     );
   }
 

@@ -26,13 +26,13 @@ export interface TotalesPorMesChartProps {
 /** Colores por tipo */
 const COLORES = {
   credito: { stroke: "#1D9E75", fill: "#1D9E7520" },
-  debito:  { stroke: "#D85A30", fill: "#D85A3020" },
+  debito: { stroke: "#D85A30", fill: "#D85A3020" },
 };
 
 /** Títulos por tipo */
 const TITULOS = {
   credito: "Créditos por mes",
-  debito:  "Débitos por mes",
+  debito: "Débitos por mes",
 };
 
 interface CustomTooltipProps {
@@ -60,7 +60,10 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
  * Gráfico de área de `/anual`: totales mensuales de créditos o débitos.
  * Se usa dos veces (una por tipo), apilados en el panel derecho.
  */
-export default function TotalesPorMesChart({ totalesPorMes, tipo }: TotalesPorMesChartProps) {
+export default function TotalesPorMesChart({
+  totalesPorMes,
+  tipo,
+}: TotalesPorMesChartProps) {
   const chartData: TotalMesData[] = Object.entries(totalesPorMes)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([mes, total]) => {
@@ -78,10 +81,7 @@ export default function TotalesPorMesChart({ totalesPorMes, tipo }: TotalesPorMe
       <p className={styles.title}>{TITULOS[tipo]}</p>
       <div className={styles.chart}>
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={chartData}
-            margin={{ top: 8, right: 8, left: 8, bottom: 0 }}
-          >
+          <AreaChart data={chartData} margin={{ top: 8, right: 8, left: 8, bottom: 0 }}>
             <defs>
               <linearGradient id={`fill-${tipo}`} x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor={color.stroke} stopOpacity={0.15} />

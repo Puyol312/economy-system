@@ -37,22 +37,15 @@ const formatearFecha = (dia: string): string => {
  * ```
  */
 export default function MovimientoCard({ movimiento }: MovimientoCardProps) {
-  const {
-    dia,
-    concepto,
-    monto,
-    tipo,
-    nroDocumento,
-    descripcion,
-    asuntoOficial,
-  } = movimiento;
+  const { dia, concepto, monto, tipo, nroDocumento, descripcion, asuntoOficial } =
+    movimiento;
 
   const esCredito = tipo === "credito";
 
   // Campos opcionales — solo los que tienen valor
   const camposOpcionales = [
-    nroDocumento  && { label: "Nro. Documento", valor: nroDocumento  },
-    descripcion   && { label: "Descripción",    valor: descripcion   },
+    nroDocumento && { label: "Nro. Documento", valor: nroDocumento },
+    descripcion && { label: "Descripción", valor: descripcion },
     asuntoOficial && { label: "Asunto Oficial", valor: asuntoOficial },
   ].filter(Boolean) as { label: string; valor: string }[];
 
@@ -66,7 +59,9 @@ export default function MovimientoCard({ movimiento }: MovimientoCardProps) {
         </div>
         <div className={styles.right}>
           <span className={styles.monto}>{formatearMoneda(monto)}</span>
-          <span className={`${styles.badge} ${esCredito ? styles.badgeCredito : styles.badgeDebito}`}>
+          <span
+            className={`${styles.badge} ${esCredito ? styles.badgeCredito : styles.badgeDebito}`}
+          >
             {esCredito ? "Crédito" : "Débito"}
           </span>
         </div>

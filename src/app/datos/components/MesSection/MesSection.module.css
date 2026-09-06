@@ -63,7 +63,9 @@
   color: var(--text-secondary);
   cursor: pointer;
   width: 100%;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .verMas:hover {

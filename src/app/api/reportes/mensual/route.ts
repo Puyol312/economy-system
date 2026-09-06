@@ -26,10 +26,7 @@ export async function POST(req: NextRequest) {
     );
   }
 
-  const response = generarReporteMensual(
-    movimientos,
-    mesParam,
-  );
+  const response = generarReporteMensual(movimientos, mesParam);
 
   if (!response) {
     return NextResponse.json(

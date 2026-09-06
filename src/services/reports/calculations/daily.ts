@@ -12,9 +12,7 @@ type BalancePorDia = Record<string, number>;
  * ]);
  * // { "2026-04-01": 32000 }
  */
-export const calcularBalancePorDia = (
-  movimientos: Movimiento[]
-): BalancePorDia => {
+export const calcularBalancePorDia = (movimientos: Movimiento[]): BalancePorDia => {
   return movimientos.reduce((acc, mov) => {
     const valor = mov.tipo === "credito" ? mov.monto : -mov.monto;
 
@@ -38,16 +36,19 @@ export const calcularBalancePorDia = (
  */
 export const obtenerTotalesPorDia = (
   movimientos: Movimiento[],
-  tipo: "credito" | "debito"
+  tipo: "credito" | "debito",
 ): Record<string, number> => {
-  return movimientos.reduce((acc, mov) => {
-    if (mov.tipo !== tipo) return acc;
+  return movimientos.reduce(
+    (acc, mov) => {
+      if (mov.tipo !== tipo) return acc;
 
-    if (!acc[mov.dia]) {
-      acc[mov.dia] = 0;
-    }
-    acc[mov.dia] += mov.monto;
+      if (!acc[mov.dia]) {
+        acc[mov.dia] = 0;
+      }
+      acc[mov.dia] += mov.monto;
 
-    return acc;
-  }, {} as Record<string, number>);
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 };

@@ -3,11 +3,11 @@ import type { Movimiento } from "@/types";
 import { calcularBalancePorDia, obtenerTotalesPorDia } from "./daily";
 
 const movimientos: Movimiento[] = [
-  { dia: "2026-04-01", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito"  },
-  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000,  tipo: "debito"  },
-  { dia: "2026-04-05", concepto: "Freelance",    monto: 10000, tipo: "credito" },
-  { dia: "2026-04-05", concepto: "Gym",          monto: 3000,  tipo: "debito"  },
+  { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+  { dia: "2026-04-05", concepto: "Freelance", monto: 10000, tipo: "credito" },
+  { dia: "2026-04-05", concepto: "Gym", monto: 3000, tipo: "debito" },
 ];
 
 // ─── calcularBalancePorDia ────────────────────────────────────────────────────
@@ -67,7 +67,7 @@ test("obtenerTotalesPorDia — devuelve objeto vacío si no hay movimientos del 
 
 test("obtenerTotalesPorDia — acumula múltiples movimientos del mismo tipo en el mismo día", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Sueldo",    monto: 50000, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
     { dia: "2026-04-01", concepto: "Freelance", monto: 10000, tipo: "credito" },
   ];
   const result = obtenerTotalesPorDia(movs, "credito");

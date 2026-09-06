@@ -66,14 +66,16 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
         </div>
         <div className={styles.headerRight}>
           <span className={styles.credito}>
-            +{new Intl.NumberFormat("es-AR", {
+            +
+            {new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
               maximumFractionDigits: 0,
             }).format(totalCreditos)}
           </span>
           <span className={styles.debito}>
-            -{new Intl.NumberFormat("es-AR", {
+            -
+            {new Intl.NumberFormat("es-AR", {
               style: "currency",
               currency: "ARS",
               maximumFractionDigits: 0,
@@ -90,13 +92,8 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
       </div>
 
       {hayMas && (
-        <button
-          className={styles.verMas}
-          onClick={() => setVerTodos((prev) => !prev)}
-        >
-          {verTodos
-            ? "Ver menos"
-            : `Ver ${movimientos.length - LIMITE_INICIAL} más`}
+        <button className={styles.verMas} onClick={() => setVerTodos((prev) => !prev)}>
+          {verTodos ? "Ver menos" : `Ver ${movimientos.length - LIMITE_INICIAL} más`}
         </button>
       )}
     </section>

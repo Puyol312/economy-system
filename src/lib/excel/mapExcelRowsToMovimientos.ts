@@ -36,53 +36,47 @@ import { parsearFecha, esFechaValida } from "./excelDate";
 export const mapearMovimientos = (rows: RowExcel[]): Movimiento[] => {
   return rows
     .map((row) => {
-
       if (!esFechaValida(row.Fecha)) return null;
       if (typeof row.Asunto !== "string" || !row.Asunto.trim()) return null;
 
       const credito = Number(row["Crédito"]) || 0;
       const debito = Number(row["Débito"]) || 0;
-      
-      const nroDoc =
-				(
-					typeof row["Número de documento"] === "string" &&
-					row["Número de documento"].trim()
-				) ?
-					row["Número de documento"].trim()
-				:	undefined;
-			const desc =
-				typeof row["Descripción"] === "string" && row["Descripción"].trim() ?
-					row["Descripción"].trim()
-				:	undefined;
 
-			const asOficial =
-				(
-					typeof row["Asunto Oficial"] === "string" &&
-					row["Asunto Oficial"].trim()
-				) ?
-					row["Asunto Oficial"].trim()
-				:	undefined;
+      const nroDoc =
+        typeof row["Número de documento"] === "string" &&
+        row["Número de documento"].trim()
+          ? row["Número de documento"].trim()
+          : undefined;
+      const desc =
+        typeof row["Descripción"] === "string" && row["Descripción"].trim()
+          ? row["Descripción"].trim()
+          : undefined;
+
+      const asOficial =
+        typeof row["Asunto Oficial"] === "string" && row["Asunto Oficial"].trim()
+          ? row["Asunto Oficial"].trim()
+          : undefined;
 
       if (credito > 0) {
         return {
-          dia:      parsearFecha(row.Fecha),
+          dia: parsearFecha(row.Fecha),
           concepto: row.Asunto,
-          monto:    credito,
+          monto: credito,
           tipo: "credito" as const,
-          ...(nroDoc    && { nroDocumento:  nroDoc    }),
-          ...(desc      && { descripcion:   desc      }),
+          ...(nroDoc && { nroDocumento: nroDoc }),
+          ...(desc && { descripcion: desc }),
           ...(asOficial && { asuntoOficial: asOficial }),
         };
       }
 
       if (debito > 0) {
         return {
-          dia:      parsearFecha(row.Fecha),
+          dia: parsearFecha(row.Fecha),
           concepto: row.Asunto,
-          monto:    debito,
+          monto: debito,
           tipo: "debito" as const,
-          ...(nroDoc    && { nroDocumento:  nroDoc    }),
-          ...(desc      && { descripcion:   desc      }),
+          ...(nroDoc && { nroDocumento: nroDoc }),
+          ...(desc && { descripcion: desc }),
           ...(asOficial && { asuntoOficial: asOficial }),
         };
       }

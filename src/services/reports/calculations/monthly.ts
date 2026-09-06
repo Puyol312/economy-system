@@ -15,20 +15,23 @@ import { calcularBalance } from "./balance";
  * // { "2026-04": [...], "2026-05": [...] }
  */
 export const agruparMovimientosPorMes = (
-  movimientos: Movimiento[]
+  movimientos: Movimiento[],
 ): Record<string, Movimiento[]> => {
-  return movimientos.reduce((acc, mov) => {
-    const [anio, mm] = mov.dia.split("-");
-    const mes = `${anio}-${mm}`;
+  return movimientos.reduce(
+    (acc, mov) => {
+      const [anio, mm] = mov.dia.split("-");
+      const mes = `${anio}-${mm}`;
 
-    if (!acc[mes]) {
-      acc[mes] = [];
-    }
+      if (!acc[mes]) {
+        acc[mes] = [];
+      }
 
-    acc[mes].push(mov);
+      acc[mes].push(mov);
 
-    return acc;
-  }, {} as Record<string, Movimiento[]>);
+      return acc;
+    },
+    {} as Record<string, Movimiento[]>,
+  );
 };
 
 /**
@@ -36,7 +39,7 @@ export const agruparMovimientosPorMes = (
  * reutilizando `agruparMovimientosPorMes` y `calcularBalance`.
  */
 export const calcularBalancePorMes = (
-  movimientos: Movimiento[]
+  movimientos: Movimiento[],
 ): Record<string, number> => {
   const movimientosPorMes = agruparMovimientosPorMes(movimientos);
   const resultado: Record<string, number> = {};
@@ -54,7 +57,7 @@ export const calcularBalancePorMes = (
  */
 export const obtenerTotalesPorMes = (
   movimientos: Movimiento[],
-  tipo: "credito" | "debito"
+  tipo: "credito" | "debito",
 ): Record<string, number> => {
   const movimientosPorMes = agruparMovimientosPorMes(movimientos);
   const resultado: Record<string, number> = {};
@@ -72,9 +75,7 @@ export const obtenerTotalesPorMes = (
  * Suma todos los valores de un objeto de totales agrupados (por mes, día, etc.).
  * Genérica: sirve tanto para totales por mes como para balances por mes.
  */
-export const obtenerAcumulado = (
-  totales: Record<string, number>
-): number => {
+export const obtenerAcumulado = (totales: Record<string, number>): number => {
   return Object.values(totales).reduce((acc, valor) => acc + valor, 0);
 };
 
@@ -84,7 +85,7 @@ export const obtenerAcumulado = (
  * que da el balance de cada mes de forma independiente.
  */
 export const calcularSaldoAcumulado = (
-  movimientos: Movimiento[]
+  movimientos: Movimiento[],
 ): Record<string, number> => {
   const balancePorMes = calcularBalancePorMes(movimientos);
   const mesesOrdenados = Object.keys(balancePorMes).sort();

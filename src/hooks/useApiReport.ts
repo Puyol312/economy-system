@@ -49,7 +49,6 @@ export function useApiReport<T>(
     };
 
     fetchReporte();
-    
   }, [hojaActiva, movimientosPorHoja, endpoint, extraBodyKey]);
 
   return { reporte, isLoading, error, hasData: Boolean(hojaActiva) };

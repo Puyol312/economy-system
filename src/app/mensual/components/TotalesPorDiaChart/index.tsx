@@ -26,12 +26,12 @@ export interface TotalesPorDiaChartProps {
 
 const COLORES = {
   credito: "#1D9E75",
-  debito:  "#D85A30",
+  debito: "#D85A30",
 };
 
 const TITULOS = {
   credito: "Créditos por día",
-  debito:  "Débitos por día",
+  debito: "Débitos por día",
 };
 
 interface CustomTooltipProps {
@@ -60,7 +60,10 @@ function CustomTooltip({ active, payload, label, tipo }: CustomTooltipProps) {
  * créditos o débitos del mes seleccionado. Se usa dos veces en la
  * página (una por tipo), que también define el color y el título.
  */
-export default function TotalesPorDiaChart({ totalesPorDia, tipo }: TotalesPorDiaChartProps) {
+export default function TotalesPorDiaChart({
+  totalesPorDia,
+  tipo,
+}: TotalesPorDiaChartProps) {
   const chartData: TotalDiaData[] = Object.entries(totalesPorDia)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([dia, total]) => ({
@@ -103,11 +106,7 @@ export default function TotalesPorDiaChart({ totalesPorDia, tipo }: TotalesPorDi
               content={<CustomTooltip tipo={tipo} />}
               cursor={{ fill: "var(--surface)" }}
             />
-            <Bar
-              dataKey="total"
-              fill={color}
-              radius={[4, 4, 0, 0]}
-            />
+            <Bar dataKey="total" fill={color} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

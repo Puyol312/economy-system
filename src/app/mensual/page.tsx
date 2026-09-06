@@ -14,7 +14,8 @@ import ConceptosTable from "./components/ConceptosTable";
 import styles from "./page.module.css";
 
 export default function MensualPage() {
-  const { reporte, mesActivo, setMesActivo, isLoading, error, hasData } = useMonthlyReport();
+  const { reporte, mesActivo, setMesActivo, isLoading, error, hasData } =
+    useMonthlyReport();
 
   if (!hasData) {
     return (
@@ -80,7 +81,7 @@ export default function MensualPage() {
             </div>
             <div className={styles.chartSide}>
               <TotalesPorDiaChart totalesPorDia={reporte.creditosPorDia} tipo="credito" />
-              <TotalesPorDiaChart totalesPorDia={reporte.debitosPorDia}  tipo="debito" />
+              <TotalesPorDiaChart totalesPorDia={reporte.debitosPorDia} tipo="debito" />
             </div>
           </div>
           <ResumenMensual

@@ -8,7 +8,8 @@ import styles from "./page.module.css";
 import { useApiReport } from "@/hooks/useApiReport";
 
 export default function DatosPage() {
-  const { reporte, isLoading, error, hasData } = useApiReport<ReporteDatosResponseDTO>("/api/reportes/datos");
+  const { reporte, isLoading, error, hasData } =
+    useApiReport<ReporteDatosResponseDTO>("/api/reportes/datos");
 
   // ── Sin archivo cargado ───────────────────────────────────────
   if (!hasData) {
@@ -59,11 +60,7 @@ export default function DatosPage() {
       <PageHeader title="Datos" breadcrumb="Movimientos" />
       <div className={styles.content}>
         {reporte.meses.map((mes) => (
-          <MesSection
-            key={mes}
-            mes={mes}
-            movimientos={reporte.movimientosPorMes[mes]}
-          />
+          <MesSection key={mes} mes={mes} movimientos={reporte.movimientosPorMes[mes]} />
         ))}
       </div>
     </div>

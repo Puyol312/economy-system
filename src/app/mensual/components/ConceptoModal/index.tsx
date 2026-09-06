@@ -53,19 +53,18 @@ export default function ConceptoModal({
 }: ConceptoModalProps) {
   // Bloquea el scroll del body mientras el modal está abierto
   useEffect(() => {
-  if (!concepto) return;
+    if (!concepto) return;
 
-  const scrollbarWidth =
-    window.innerWidth - document.documentElement.clientWidth;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
 
-  document.body.style.overflow = "hidden";
-  document.body.style.paddingRight = `${scrollbarWidth}px`;
+    document.body.style.overflow = "hidden";
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
 
-  return () => {
-    document.body.style.overflow = "";
-    document.body.style.paddingRight = "";
-  };
-}, [concepto]);
+    return () => {
+      document.body.style.overflow = "";
+      document.body.style.paddingRight = "";
+    };
+  }, [concepto]);
 
   // Cierra con Escape
   useEffect(() => {
@@ -84,7 +83,7 @@ export default function ConceptoModal({
     .sort((a, b) => a.dia.localeCompare(b.dia));
 
   const esCredito = movimientos[0]?.tipo === "credito";
-  const tipo      = esCredito ? "Créditos" : "Débitos";
+  const tipo = esCredito ? "Créditos" : "Débitos";
 
   return (
     <div
@@ -94,16 +93,14 @@ export default function ConceptoModal({
       aria-modal="true"
       aria-label={`Detalle de ${concepto}`}
     >
-      <div
-        className={styles.modal}
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         {/* Header */}
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <h2 className={styles.titulo}>{concepto}</h2>
             <p className={styles.subtitulo}>
-              {movimientos.length} movimiento{movimientos.length !== 1 ? "s" : ""} · {tipo}
+              {movimientos.length} movimiento{movimientos.length !== 1 ? "s" : ""} ·{" "}
+              {tipo}
             </p>
           </div>
           <button
@@ -112,8 +109,24 @@ export default function ConceptoModal({
             aria-label="Cerrar modal"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-              <line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <line
+                x1="18"
+                y1="6"
+                x2="6"
+                y2="18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
+              <line
+                x1="6"
+                y1="6"
+                x2="18"
+                y2="18"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
           </button>
         </div>
@@ -121,10 +134,7 @@ export default function ConceptoModal({
         {/* Lista de movimientos */}
         <div className={styles.lista}>
           {movimientos.map((mov, i) => (
-            <MovimientoCard
-              key={`${mov.dia}-${mov.concepto}-${i}`}
-              movimiento={mov}
-            />
+            <MovimientoCard key={`${mov.dia}-${mov.concepto}-${i}`} movimiento={mov} />
           ))}
         </div>
       </div>

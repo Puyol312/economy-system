@@ -5,8 +5,10 @@ import { agruparPorConcepto } from "./calculations/concepts";
 
 import { agruparMovimientosPorMes, calcularSaldoAcumulado } from "./calculations/monthly";
 
-export const generarReporteMensual = ( movimientos: Movimiento[], mesParam?: string , ): ReporteMensualResponseDTO | null => {
-
+export const generarReporteMensual = (
+  movimientos: Movimiento[],
+  mesParam?: string,
+): ReporteMensualResponseDTO | null => {
   const movimientosPorMes = agruparMovimientosPorMes(movimientos);
 
   const meses = Object.keys(movimientosPorMes).sort();
@@ -47,15 +49,15 @@ export const generarReporteMensual = ( movimientos: Movimiento[], mesParam?: str
   if (mesAnterior) {
     const movimientosMesAnterior = movimientosPorMes[mesAnterior] ?? [];
 
-    const creditosMesAnterior = obtenerTotalesPorDia( movimientosMesAnterior, "credito");
-    const debitosMesAnterior = obtenerTotalesPorDia( movimientosMesAnterior, "debito");
-    totalCreditosAnterior =sumarTotales(creditosMesAnterior);
-    totalDebitosAnterior =sumarTotales(debitosMesAnterior);
+    const creditosMesAnterior = obtenerTotalesPorDia(movimientosMesAnterior, "credito");
+    const debitosMesAnterior = obtenerTotalesPorDia(movimientosMesAnterior, "debito");
+    totalCreditosAnterior = sumarTotales(creditosMesAnterior);
+    totalDebitosAnterior = sumarTotales(debitosMesAnterior);
     balanceMesAnterior = calcularBalance(movimientosMesAnterior);
-    
-    variacionCreditos = calcularVariacion( totalCreditosAnterior, totalCreditos);
-    variacionDebitos = calcularVariacion( totalDebitosAnterior, totalDebitos);
-    variacionBalance = calcularVariacion( balanceMesAnterior, balanceMes);
+
+    variacionCreditos = calcularVariacion(totalCreditosAnterior, totalCreditos);
+    variacionDebitos = calcularVariacion(totalDebitosAnterior, totalDebitos);
+    variacionBalance = calcularVariacion(balanceMesAnterior, balanceMes);
   }
 
   return {
@@ -84,10 +86,7 @@ export const generarReporteMensual = ( movimientos: Movimiento[], mesParam?: str
   };
 };
 
-const calcularVariacion = (
-  anterior: number,
-  actual: number,
-): number | null => {
+const calcularVariacion = (anterior: number, actual: number): number | null => {
   if (anterior === 0) {
     return actual === 0 ? 0 : null;
   }

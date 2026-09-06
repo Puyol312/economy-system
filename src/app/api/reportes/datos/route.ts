@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import type { Movimiento } from "@/types";
 import { generarReporteDatos } from "@/services/reports/generateDataReport";
 
-
 /**
  * POST /api/reportes/datos
  *
@@ -33,7 +32,7 @@ export async function POST(req: NextRequest) {
   } catch {
     return NextResponse.json(
       { message: "El cuerpo de la solicitud no es válido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
@@ -42,14 +41,14 @@ export async function POST(req: NextRequest) {
   if (!movimientos || !Array.isArray(movimientos)) {
     return NextResponse.json(
       { message: "El campo 'movimientos' es requerido." },
-      { status: 400 }
+      { status: 400 },
     );
   }
 
   if (movimientos.length === 0) {
     return NextResponse.json(
       { message: "No hay movimientos disponibles." },
-      { status: 404 }
+      { status: 404 },
     );
   }
 

@@ -114,9 +114,7 @@ export default function PageHeader({
               key={tab.id}
               role="tab"
               aria-selected={tab.id === activeTab}
-              className={`${styles.tab} ${
-                tab.id === activeTab ? styles.tabActive : ""
-              }`}
+              className={`${styles.tab} ${tab.id === activeTab ? styles.tabActive : ""}`}
               onClick={() => onTabChange?.(tab.id)}
             >
               {tab.label}

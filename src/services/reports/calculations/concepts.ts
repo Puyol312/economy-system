@@ -13,19 +13,22 @@ import type { Movimiento } from "@/types";
  */
 export const agruparPorConcepto = (
   movimientos: Movimiento[],
-  tipo: "credito" | "debito"
+  tipo: "credito" | "debito",
 ): [string, number][] => {
-  const agrupado = movimientos.reduce((acc, mov) => {
-    if (mov.tipo !== tipo) return acc;
+  const agrupado = movimientos.reduce(
+    (acc, mov) => {
+      if (mov.tipo !== tipo) return acc;
 
-    if (!acc[mov.concepto]) {
-      acc[mov.concepto] = 0;
-    }
+      if (!acc[mov.concepto]) {
+        acc[mov.concepto] = 0;
+      }
 
-    acc[mov.concepto] += mov.monto;
+      acc[mov.concepto] += mov.monto;
 
-    return acc;
-  }, {} as Record<string, number>);
+      return acc;
+    },
+    {} as Record<string, number>,
+  );
 
   return Object.entries(agrupado).sort(([, a], [, b]) => b - a);
 };

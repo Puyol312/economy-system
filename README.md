@@ -66,7 +66,7 @@ src/
 El archivo `.xlsx` debe tener la siguiente estructura en cada hoja:
 
 | FECHA      | ASUNTO       | DEBITO | CREDITO |
-|------------|--------------|--------|---------|
+| ---------- | ------------ | ------ | ------- |
 | 2026-04-01 | Sueldo       |        | 50000   |
 | 2026-04-02 | Supermercado | 8000   |         |
 | 2026-04-15 | Alquiler     | 20000  |         |

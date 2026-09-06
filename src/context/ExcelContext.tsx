@@ -1,12 +1,6 @@
 "use client";
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useCallback,
-  type ReactNode,
-} from "react";
+import { createContext, useContext, useState, useCallback, type ReactNode } from "react";
 
 import type { Movimiento } from "@/types";
 import { uploadExcel } from "@/services/upload/uploadExcel";
@@ -29,7 +23,10 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [hojas, setHojas] = useState<string[] | null>(null);
   const [hojaActiva, setHojaActiva] = useState<string | null>(null);
-  const [movimientosPorHoja, setMovimientosPorHoja] = useState<Record<string, Movimiento[]> | null>(null);
+  const [movimientosPorHoja, setMovimientosPorHoja] = useState<Record<
+    string,
+    Movimiento[]
+  > | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +44,7 @@ export function ExcelProvider({ children }: { children: ReactNode }) {
       setMovimientosPorHoja(movimientosPorHoja);
     } catch (err) {
       setError(
-        err instanceof Error
-          ? err.message
-          : "Error desconocido al procesar el archivo."
+        err instanceof Error ? err.message : "Error desconocido al procesar el archivo.",
       );
     } finally {
       setIsLoading(false);
@@ -87,9 +82,7 @@ export function useExcel(): ExcelContextValue {
   const context = useContext(ExcelContext);
 
   if (!context) {
-    throw new Error(
-      "useExcel debe usarse dentro de un <ExcelProvider>."
-    );
+    throw new Error("useExcel debe usarse dentro de un <ExcelProvider>.");
   }
 
   return context;

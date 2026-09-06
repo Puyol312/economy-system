@@ -4,11 +4,11 @@ import type { Movimiento } from "@/types";
 import { calcularBalance, sumarTotales } from "./balance";
 
 const movimientos: Movimiento[] = [
-  { dia: "2026-04-01", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito"  },
-  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000,  tipo: "debito"  },
-  { dia: "2026-04-05", concepto: "Freelance",    monto: 10000, tipo: "credito" },
-  { dia: "2026-04-05", concepto: "Gym",          monto: 3000,  tipo: "debito"  },
+  { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+  { dia: "2026-04-02", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+  { dia: "2026-04-05", concepto: "Freelance", monto: 10000, tipo: "credito" },
+  { dia: "2026-04-05", concepto: "Gym", monto: 3000, tipo: "debito" },
 ];
 
 // ─── calcularBalance ──────────────────────────────────────────────────────────
@@ -23,16 +23,16 @@ test("calcularBalance — devuelve 0 con array vacío", (t) => {
 
 test("calcularBalance — devuelve negativo si débitos superan créditos", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito"  },
-    { dia: "2026-04-01", concepto: "Supermercado", monto: 5000,  tipo: "debito"  },
-    { dia: "2026-04-01", concepto: "Sueldo",       monto: 10000, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+    { dia: "2026-04-01", concepto: "Supermercado", monto: 5000, tipo: "debito" },
+    { dia: "2026-04-01", concepto: "Sueldo", monto: 10000, tipo: "credito" },
   ];
   t.is(calcularBalance(movs), -15000);
 });
 
 test("calcularBalance — solo créditos devuelve suma positiva", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Sueldo",    monto: 50000, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
     { dia: "2026-04-02", concepto: "Freelance", monto: 10000, tipo: "credito" },
   ];
   t.is(calcularBalance(movs), 60000);
@@ -40,8 +40,8 @@ test("calcularBalance — solo créditos devuelve suma positiva", (t) => {
 
 test("calcularBalance — solo débitos devuelve suma negativa", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito" },
-    { dia: "2026-04-02", concepto: "Supermercado", monto: 8000,  tipo: "debito" },
+    { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+    { dia: "2026-04-02", concepto: "Supermercado", monto: 8000, tipo: "debito" },
   ];
   t.is(calcularBalance(movs), -28000);
 });

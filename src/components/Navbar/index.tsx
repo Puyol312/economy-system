@@ -17,7 +17,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: "/", label: "Home" },
-    { href: "/datos", label: "Datos"},
+    { href: "/datos", label: "Datos" },
     { href: "/mensual", label: "Mensual" },
     { href: "/anual", label: "Anual" },
   ];
@@ -42,9 +42,7 @@ export default function Navbar() {
           <Link
             key={href}
             href={href}
-            className={`${styles.navLink} ${
-              pathname === href ? styles.active : ""
-            }`}
+            className={`${styles.navLink} ${pathname === href ? styles.active : ""}`}
           >
             {label}
           </Link>

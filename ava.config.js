@@ -1,4 +1,4 @@
-export default {
+const config = {
   files: ["src/**/*.test.ts"],
   extensions: ["ts"],
   nodeArguments: ["--import=tsx"],
@@ -6,3 +6,5 @@ export default {
     TESTING: "true",
   },
 };
+
+export default config;

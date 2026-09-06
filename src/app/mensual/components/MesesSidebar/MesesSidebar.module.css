@@ -35,7 +35,9 @@
   border-radius: 8px;
   padding: 8px 10px;
   cursor: pointer;
-  transition: background 0.15s, color 0.15s;
+  transition:
+    background 0.15s,
+    color 0.15s;
 }
 
 .item:hover {
@@ -97,7 +99,10 @@
     padding: 6px 14px;
     cursor: pointer;
     flex-shrink: 0;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition:
+      background 0.15s,
+      color 0.15s,
+      border-color 0.15s;
   }
 
   .mobileItem:hover {

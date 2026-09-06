@@ -21,11 +21,7 @@ test("parseExcel: debería parsear un Excel con una hoja", (t) => {
 
   const workbook = XLSX.utils.book_new();
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    worksheet,
-    "Abril"
-  );
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Abril");
 
   const buffer = XLSX.write(workbook, {
     type: "buffer",
@@ -36,28 +32,22 @@ test("parseExcel: debería parsear un Excel con una hoja", (t) => {
 
   t.deepEqual(resultado.hojas, ["Abril"]);
 
-  t.is(
-    resultado.movimientosPorHoja["Abril"].length,
-    2
-  );
+  t.is(resultado.movimientosPorHoja["Abril"].length, 2);
 
-  t.deepEqual(
-    resultado.movimientosPorHoja["Abril"],
-    [
-      {
-        dia: "2026-04-01",
-        concepto: "Sueldo",
-        monto: 50000,
-        tipo: "credito",
-      },
-      {
-        dia: "2026-04-02",
-        concepto: "Supermercado",
-        monto: 3000,
-        tipo: "debito",
-      },
-    ]
-  );
+  t.deepEqual(resultado.movimientosPorHoja["Abril"], [
+    {
+      dia: "2026-04-01",
+      concepto: "Sueldo",
+      monto: 50000,
+      tipo: "credito",
+    },
+    {
+      dia: "2026-04-02",
+      concepto: "Supermercado",
+      monto: 3000,
+      tipo: "debito",
+    },
+  ]);
 });
 
 test("parseExcel: debería procesar múltiples hojas", (t) => {
@@ -79,17 +69,9 @@ test("parseExcel: debería procesar múltiples hojas", (t) => {
     },
   ]);
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    abril,
-    "Abril"
-  );
+  XLSX.utils.book_append_sheet(workbook, abril, "Abril");
 
-  XLSX.utils.book_append_sheet(
-    workbook,
-    mayo,
-    "Mayo"
-  );
+  XLSX.utils.book_append_sheet(workbook, mayo, "Mayo");
 
   const buffer = XLSX.write(workbook, {
     type: "buffer",
@@ -98,18 +80,9 @@ test("parseExcel: debería procesar múltiples hojas", (t) => {
 
   const resultado = parseExcel(buffer);
 
-  t.deepEqual(resultado.hojas, [
-    "Abril",
-    "Mayo",
-  ]);
+  t.deepEqual(resultado.hojas, ["Abril", "Mayo"]);
 
-  t.is(
-    resultado.movimientosPorHoja.Abril.length,
-    1
-  );
+  t.is(resultado.movimientosPorHoja.Abril.length, 1);
 
-  t.is(
-    resultado.movimientosPorHoja.Mayo.length,
-    1
-  );
+  t.is(resultado.movimientosPorHoja.Mayo.length, 1);
 });

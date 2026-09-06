@@ -38,8 +38,5 @@ export const esFechaValida = (fecha: unknown): fecha is string => {
 
   const partes = fecha.split("/");
 
-  return (
-    partes.length === 3 &&
-    partes.every((parte) => parte.length > 0)
-  );
+  return partes.length === 3 && partes.every((parte) => parte.length > 0);
 };

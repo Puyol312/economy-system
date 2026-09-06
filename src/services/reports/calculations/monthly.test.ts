@@ -11,13 +11,13 @@ import type { Movimiento } from "@/types";
 // ─── Fixtures ─────────────────────────────────────────────────────────────────
 
 const movimientos: Movimiento[] = [
-  { dia: "2026-01-05", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-01-10", concepto: "Alquiler",     monto: 20000, tipo: "debito"  },
-  { dia: "2026-01-15", concepto: "Supermercado", monto: 8000,  tipo: "debito"  },
-  { dia: "2026-02-03", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-02-08", concepto: "Restaurante",  monto: 6000,  tipo: "debito"  },
-  { dia: "2026-03-01", concepto: "Sueldo",       monto: 50000, tipo: "credito" },
-  { dia: "2026-03-15", concepto: "Gym",          monto: 3000,  tipo: "debito"  },
+  { dia: "2026-01-05", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-01-10", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+  { dia: "2026-01-15", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+  { dia: "2026-02-03", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-02-08", concepto: "Restaurante", monto: 6000, tipo: "debito" },
+  { dia: "2026-03-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+  { dia: "2026-03-15", concepto: "Gym", monto: 3000, tipo: "debito" },
 ];
 
 // ─── agruparMovimientosPorMes ─────────────────────────────────────────────────
@@ -36,7 +36,7 @@ test("agruparMovimientosPorMes — agrupa la cantidad correcta de movimientos po
 
 test("agruparMovimientosPorMes — no pierde movimientos del último día del mes anterior", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-02-28", concepto: "Pago",  monto: 5000,  tipo: "debito"  },
+    { dia: "2026-02-28", concepto: "Pago", monto: 5000, tipo: "debito" },
     { dia: "2026-03-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
   ];
 
@@ -83,9 +83,9 @@ test("calcularBalancePorMes — genera las claves de los tres meses", (t) => {
 
 test("calcularBalancePorMes — mes con balance negativo", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Alquiler",     monto: 20000, tipo: "debito" },
-    { dia: "2026-04-02", concepto: "Supermercado", monto: 8000,  tipo: "debito" },
-    { dia: "2026-04-03", concepto: "Sueldo",       monto: 10000, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Alquiler", monto: 20000, tipo: "debito" },
+    { dia: "2026-04-02", concepto: "Supermercado", monto: 8000, tipo: "debito" },
+    { dia: "2026-04-03", concepto: "Sueldo", monto: 10000, tipo: "credito" },
   ];
 
   const result = calcularBalancePorMes(movs);
@@ -128,7 +128,7 @@ test("obtenerTotalesPorMes — mes sin movimientos del tipo no aparece en el res
 
 test("obtenerTotalesPorMes — acumula múltiples créditos en el mismo mes", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-04-01", concepto: "Sueldo",    monto: 50000, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
     { dia: "2026-04-15", concepto: "Freelance", monto: 10000, tipo: "credito" },
   ];
 
@@ -189,8 +189,8 @@ test("devuelve objeto vacío con array vacío", (t) => {
 
 test("saldo puede ser negativo si los débitos superan los créditos acumulados", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-01-01", concepto: "Sueldo",    monto: 10000, tipo: "credito" },
-    { dia: "2026-02-01", concepto: "Alquiler",  monto: 15000, tipo: "debito"  },
+    { dia: "2026-01-01", concepto: "Sueldo", monto: 10000, tipo: "credito" },
+    { dia: "2026-02-01", concepto: "Alquiler", monto: 15000, tipo: "debito" },
   ];
 
   const result = calcularSaldoAcumulado(movs);
@@ -201,9 +201,9 @@ test("saldo puede ser negativo si los débitos superan los créditos acumulados"
 
 test("un mes con gasto mayor al saldo acumulado da negativo", (t) => {
   const movs: Movimiento[] = [
-    { dia: "2026-01-01", concepto: "Sueldo",        monto: 1000,  tipo: "credito" },
-    { dia: "2026-02-01", concepto: "Gasto grande",  monto: 5000,  tipo: "debito"  },
-    { dia: "2026-03-01", concepto: "Sueldo",        monto: 10000, tipo: "credito" },
+    { dia: "2026-01-01", concepto: "Sueldo", monto: 1000, tipo: "credito" },
+    { dia: "2026-02-01", concepto: "Gasto grande", monto: 5000, tipo: "debito" },
+    { dia: "2026-03-01", concepto: "Sueldo", monto: 10000, tipo: "credito" },
   ];
 
   const result = calcularSaldoAcumulado(movs);
@@ -215,10 +215,10 @@ test("un mes con gasto mayor al saldo acumulado da negativo", (t) => {
 
 test("respeta el orden cronológico independientemente del orden del input", (t) => {
   const movsDesordenados: Movimiento[] = [
-    { dia: "2026-03-01", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
-    { dia: "2026-01-05", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
-    { dia: "2026-01-10", concepto: "Alquiler", monto: 28000, tipo: "debito"  },
-    { dia: "2026-02-03", concepto: "Sueldo",   monto: 50000, tipo: "credito" },
+    { dia: "2026-03-01", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+    { dia: "2026-01-05", concepto: "Sueldo", monto: 50000, tipo: "credito" },
+    { dia: "2026-01-10", concepto: "Alquiler", monto: 28000, tipo: "debito" },
+    { dia: "2026-02-03", concepto: "Sueldo", monto: 50000, tipo: "credito" },
   ];
 
   const result = calcularSaldoAcumulado(movsDesordenados);

@@ -47,13 +47,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(response);
   } catch (error) {
     const message =
-      error instanceof Error
-        ? error.message
-        : "Error al procesar el archivo.";
+      error instanceof Error ? error.message : "Error al procesar el archivo.";
 
-    return NextResponse.json(
-      { message },
-      { status: 500 },
-    );
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

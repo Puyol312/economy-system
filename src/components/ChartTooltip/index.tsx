@@ -25,11 +25,7 @@ export interface ChartTooltipProps {
  * "secondary". Ambas variantes ya existían idénticas en los 4
  * módulos CSS originales.
  */
-export default function ChartTooltip({
-  title,
-  lines,
-  size = "main",
-}: ChartTooltipProps) {
+export default function ChartTooltip({ title, lines, size = "main" }: ChartTooltipProps) {
   return (
     <div className={`${styles.tooltip} ${size === "secondary" ? styles.secondary : ""}`}>
       <p className={styles.tooltipLabel}>{title}</p>

@@ -13,7 +13,8 @@ import ResumenAnual from "./components/ResumenAnual";
 import styles from "./page.module.css";
 
 export default function AnualPage() {
-  const { reporte, isLoading, error, hasData } = useApiReport<ReporteAnualResponseDTO>("/api/reportes/anual");
+  const { reporte, isLoading, error, hasData } =
+    useApiReport<ReporteAnualResponseDTO>("/api/reportes/anual");
 
   if (!hasData) {
     return (
@@ -72,7 +73,7 @@ export default function AnualPage() {
           </div>
           <div className={styles.chartSide}>
             <TotalesPorMesChart totalesPorMes={reporte.creditosPorMes} tipo="credito" />
-            <TotalesPorMesChart totalesPorMes={reporte.debitosPorMes}  tipo="debito" />
+            <TotalesPorMesChart totalesPorMes={reporte.debitosPorMes} tipo="debito" />
           </div>
         </div>
         <ResumenAnual

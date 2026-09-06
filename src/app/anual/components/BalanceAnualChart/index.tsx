@@ -17,8 +17,8 @@ import { formatearCompacto, MESES_CORTOS } from "@/lib/format";
 import ChartTooltip from "@/components/ChartTooltip";
 
 interface BalanceMesData {
-  mes:            string;
-  balance:        number;
+  mes: string;
+  balance: number;
   saldoAcumulado: number;
 }
 
@@ -55,14 +55,17 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
  * Gráfico combinado de `/anual`: barras con el balance neto mensual
  * (verde positivo, rojo negativo) y una línea con el saldo acumulado.
  */
-export default function BalanceAnualChart({ balancePorMes, saldoAcumulado }: BalanceAnualChartProps) {
+export default function BalanceAnualChart({
+  balancePorMes,
+  saldoAcumulado,
+}: BalanceAnualChartProps) {
   const chartData: BalanceMesData[] = Object.keys(balancePorMes)
     .sort()
     .map((mes) => {
       const [, mm] = mes.split("-");
       return {
-        mes:            MESES_CORTOS[mm] ?? mes,
-        balance:        balancePorMes[mes],
+        mes: MESES_CORTOS[mm] ?? mes,
+        balance: balancePorMes[mes],
         saldoAcumulado: saldoAcumulado[mes] ?? 0,
       };
     });
@@ -95,10 +98,7 @@ export default function BalanceAnualChart({ balancePorMes, saldoAcumulado }: Bal
               tickFormatter={formatearCompacto}
               width={52}
             />
-            <Tooltip
-              content={<CustomTooltip />}
-              cursor={{ fill: "var(--surface)" }}
-            />
+            <Tooltip content={<CustomTooltip />} cursor={{ fill: "var(--surface)" }} />
             <Legend
               formatter={(value) =>
                 value === "balance" ? "Balance del mes" : "Saldo acumulado"
@@ -107,10 +107,7 @@ export default function BalanceAnualChart({ balancePorMes, saldoAcumulado }: Bal
             />
             <Bar dataKey="balance" radius={[4, 4, 0, 0]} name="balance">
               {chartData.map((entry, index) => (
-                <Cell
-                  key={index}
-                  fill={entry.balance >= 0 ? "#1D9E75" : "#D85A30"}
-                />
+                <Cell key={index} fill={entry.balance >= 0 ? "#1D9E75" : "#D85A30"} />
               ))}
             </Bar>
             <Line
