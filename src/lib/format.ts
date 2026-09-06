@@ -1,13 +1,21 @@
 /**
- * Formatea un número como moneda local (ARS) sin decimales.
+ * Formatea un número como moneda local (ARS).
+ * Sin decimales si el monto es un peso entero; con 2 decimales
+ * si tiene centavos.
  * @example formatearMoneda(50000) // "$50.000"
+ * @example formatearMoneda(99.5)  // "$99,50"
  */
-export const formatearMoneda = (valor: number): string =>
-  new Intl.NumberFormat("es-AR", {
+export const formatearMoneda = (valor: number): string => {
+  const esEntero = Math.abs(valor - Math.round(valor)) < 0.005;
+  const decimales = esEntero ? 0 : 2;
+
+  return new Intl.NumberFormat("es-AR", {
     style: "currency",
     currency: "ARS",
-    maximumFractionDigits: 0,
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales,
   }).format(valor);
+};
 
 /**
  * Formatea un número en notación compacta, para ejes de gráficos.
