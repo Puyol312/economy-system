@@ -46,7 +46,7 @@ const movimientos: Movimiento[] = [
   },
 ];
 
-test("generarReporteMensual - debería generar correctamente el primer mes", (t) => {
+test("generarReporteMensual - debería seleccionar el último mes por defecto", (t) => {
   const resultado = generarReporteMensual(movimientos);
 
   t.truthy(resultado);
@@ -55,15 +55,42 @@ test("generarReporteMensual - debería generar correctamente el primer mes", (t)
 
   t.deepEqual(resultado.meses, ["2026-01", "2026-02"]);
 
+  // Sin mesParam, se carga el mes más reciente (Febrero), no el primero.
+  t.is(resultado.mes, "2026-02");
+
+  t.is(resultado.totalCreditos, 60000);
+  t.is(resultado.totalDebitos, 30000);
+  t.is(resultado.balanceMes, 30000);
+
+  t.is(resultado.saldoAlCierre, 52000);
+
+  t.is(resultado.movimientosMes.length, 3);
+
+  t.deepEqual(resultado.comparacion, {
+    mesAnterior: "2026-01",
+
+    totalCreditosAnterior: 50000,
+    totalDebitosAnterior: 28000,
+    balanceMesAnterior: 22000,
+
+    variacionCreditos: 20,
+    variacionDebitos: ((30000 - 28000) / Math.abs(28000)) * 100,
+    variacionBalance: ((30000 - 22000) / Math.abs(22000)) * 100,
+  });
+});
+
+test("generarReporteMensual - primer mes explícito no tiene mes anterior", (t) => {
+  const resultado = generarReporteMensual(movimientos, "2026-01");
+
+  t.truthy(resultado);
+
+  if (!resultado) return;
+
   t.is(resultado.mes, "2026-01");
 
   t.is(resultado.totalCreditos, 50000);
   t.is(resultado.totalDebitos, 28000);
   t.is(resultado.balanceMes, 22000);
-
-  t.is(resultado.saldoAlCierre, 22000);
-
-  t.is(resultado.movimientosMes.length, 3);
 
   t.deepEqual(resultado.comparacion, {
     mesAnterior: null,
