@@ -47,15 +47,11 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
 
   const hayMas = movimientos.length > LIMITE_INICIAL;
   const totalCreditos = redondearMonto(
-    movimientos
-      .filter((m) => m.tipo === "credito")
-      .reduce((acc, m) => acc + m.monto, 0),
+    movimientos.filter((m) => m.tipo === "credito").reduce((acc, m) => acc + m.monto, 0),
   );
 
   const totalDebitos = redondearMonto(
-    movimientos
-      .filter((m) => m.tipo === "debito")
-      .reduce((acc, m) => acc + m.monto, 0),
+    movimientos.filter((m) => m.tipo === "debito").reduce((acc, m) => acc + m.monto, 0),
   );
 
   return (

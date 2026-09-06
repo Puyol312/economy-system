@@ -20,7 +20,9 @@
 export const redondearMonto = (valor: number): number =>
   Math.round((valor + Number.EPSILON) * 100) / 100;
 
-export const redondearTotales = (totales: Record<string, number>): Record<string, number> => {
+export const redondearTotales = (
+  totales: Record<string, number>,
+): Record<string, number> => {
   const resultado: Record<string, number> = {};
   for (const clave in totales) {
     resultado[clave] = redondearMonto(totales[clave]);

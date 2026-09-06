@@ -37,7 +37,10 @@ export const calcularBalancePorDia = (movimientos: Movimiento[]): BalancePorDia 
  * obtenerTotalesPorDia(movimientos, "credito");
  * // { "2026-04-01": 60000 }
  */
-export const obtenerTotalesPorDia = (movimientos: Movimiento[], tipo: "credito" | "debito" ): Record<string, number> => {
+export const obtenerTotalesPorDia = (
+  movimientos: Movimiento[],
+  tipo: "credito" | "debito",
+): Record<string, number> => {
   const acumulado = movimientos.reduce(
     (acc, mov) => {
       if (mov.tipo !== tipo) return acc;

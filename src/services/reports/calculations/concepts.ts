@@ -12,7 +12,10 @@ import { redondearMonto } from "@/lib/money";
  * agruparPorConcepto(movimientos, "credito");
  * // [["Sueldo", 55000], ["Freelance", 10000]]
  */
-export const agruparPorConcepto = ( movimientos: Movimiento[], tipo: "credito" | "debito" ): [string, number][] => {
+export const agruparPorConcepto = (
+  movimientos: Movimiento[],
+  tipo: "credito" | "debito",
+): [string, number][] => {
   const agrupado = movimientos.reduce(
     (acc, mov) => {
       if (mov.tipo !== tipo) return acc;

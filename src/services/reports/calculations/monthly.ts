@@ -15,7 +15,9 @@ import { redondearMonto, redondearTotales } from "@/lib/money";
  * ]);
  * // { "2026-04": [...], "2026-05": [...] }
  */
-export const agruparMovimientosPorMes = (movimientos: Movimiento[]): Record<string, Movimiento[]> => {
+export const agruparMovimientosPorMes = (
+  movimientos: Movimiento[],
+): Record<string, Movimiento[]> => {
   return movimientos.reduce(
     (acc, mov) => {
       const [anio, mm] = mov.dia.split("-");
