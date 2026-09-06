@@ -1,4 +1,5 @@
 import type { Movimiento } from "@/types";
+import { redondearMonto } from "@/lib/money";
 
 /**
  * Agrupa los movimientos por concepto para un tipo específico y suma
@@ -11,10 +12,7 @@ import type { Movimiento } from "@/types";
  * agruparPorConcepto(movimientos, "credito");
  * // [["Sueldo", 55000], ["Freelance", 10000]]
  */
-export const agruparPorConcepto = (
-  movimientos: Movimiento[],
-  tipo: "credito" | "debito",
-): [string, number][] => {
+export const agruparPorConcepto = ( movimientos: Movimiento[], tipo: "credito" | "debito" ): [string, number][] => {
   const agrupado = movimientos.reduce(
     (acc, mov) => {
       if (mov.tipo !== tipo) return acc;
@@ -30,5 +28,7 @@ export const agruparPorConcepto = (
     {} as Record<string, number>,
   );
 
-  return Object.entries(agrupado).sort(([, a], [, b]) => b - a);
+  return Object.entries(agrupado)
+    .map(([concepto, total]) => [concepto, redondearMonto(total)] as [string, number])
+    .sort(([, a], [, b]) => b - a);
 };

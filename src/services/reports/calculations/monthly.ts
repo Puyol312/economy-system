@@ -1,5 +1,6 @@
 import type { Movimiento } from "@/types";
 import { calcularBalance } from "./balance";
+import { redondearMonto, redondearTotales } from "@/lib/money";
 
 /**
  * Agrupa una lista de movimientos por mes ("YYYY-MM").
@@ -14,9 +15,7 @@ import { calcularBalance } from "./balance";
  * ]);
  * // { "2026-04": [...], "2026-05": [...] }
  */
-export const agruparMovimientosPorMes = (
-  movimientos: Movimiento[],
-): Record<string, Movimiento[]> => {
+export const agruparMovimientosPorMes = (movimientos: Movimiento[]): Record<string, Movimiento[]> => {
   return movimientos.reduce(
     (acc, mov) => {
       const [anio, mm] = mov.dia.split("-");
@@ -68,7 +67,7 @@ export const obtenerTotalesPorMes = (
     }, 0);
   }
 
-  return resultado;
+  return redondearTotales(resultado);
 };
 
 /**
@@ -76,7 +75,9 @@ export const obtenerTotalesPorMes = (
  * Genérica: sirve tanto para totales por mes como para balances por mes.
  */
 export const obtenerAcumulado = (totales: Record<string, number>): number => {
-  return Object.values(totales).reduce((acc, valor) => acc + valor, 0);
+  const suma = Object.values(totales).reduce((acc, valor) => acc + valor, 0);
+
+  return redondearMonto(suma);
 };
 
 /**
@@ -94,7 +95,7 @@ export const calcularSaldoAcumulado = (
   const resultado: Record<string, number> = {};
 
   for (const mes of mesesOrdenados) {
-    saldoAcumulado += balancePorMes[mes];
+    saldoAcumulado = redondearMonto(saldoAcumulado + balancePorMes[mes]);
     resultado[mes] = saldoAcumulado;
   }
 

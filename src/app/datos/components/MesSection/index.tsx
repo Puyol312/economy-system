@@ -4,8 +4,8 @@ import type { Movimiento } from "@/types";
 import MovimientoCard from "@/components/MovimientoCard";
 import styles from "./MesSection.module.css";
 import { useState } from "react";
-import { formatearMes } from "@/lib/format";
-
+import { formatearMes, formatearMoneda } from "@/lib/format";
+import { redondearMonto } from "@/lib/money";
 /**
  * MesSectionProps
  */
@@ -46,13 +46,17 @@ export default function MesSection({ mes, movimientos }: MesSectionProps) {
     : movimientos.slice(0, LIMITE_INICIAL);
 
   const hayMas = movimientos.length > LIMITE_INICIAL;
-  const totalCreditos = movimientos
-    .filter((m) => m.tipo === "credito")
-    .reduce((acc, m) => acc + m.monto, 0);
+  const totalCreditos = redondearMonto(
+    movimientos
+      .filter((m) => m.tipo === "credito")
+      .reduce((acc, m) => acc + m.monto, 0),
+  );
 
-  const totalDebitos = movimientos
-    .filter((m) => m.tipo === "debito")
-    .reduce((acc, m) => acc + m.monto, 0);
+  const totalDebitos = redondearMonto(
+    movimientos
+      .filter((m) => m.tipo === "debito")
+      .reduce((acc, m) => acc + m.monto, 0),
+  );
 
   return (
     <section className={styles.section}>

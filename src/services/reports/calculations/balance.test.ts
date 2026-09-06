@@ -60,3 +60,11 @@ test("sumarTotales — funciona con valores negativos", (t) => {
   const totales = { "2026-04-01": 30000, "2026-04-02": -8000 };
   t.is(sumarTotales(totales), 22000);
 });
+// ─── Regresión: ruido de punto flotante en sumas de decimales ─────────────────
+test("calcularBalance — no arrastra ruido de punto flotante en sumas de decimales", (t) => {
+  const movs: Movimiento[] = [
+    { dia: "2026-04-01", concepto: "Concepto A", monto: 0.01, tipo: "credito" },
+    { dia: "2026-04-01", concepto: "Concepto B", monto: 99.48, tipo: "credito" },
+  ];
+  t.is(calcularBalance(movs), 99.49);
+});
