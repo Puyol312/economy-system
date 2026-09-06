@@ -17,7 +17,8 @@ export const generarReporteMensual = (
     return null;
   }
 
-  const mes = mesParam && movimientosPorMes[mesParam] ? mesParam : meses[meses.length - 1];
+  const mes =
+    mesParam && movimientosPorMes[mesParam] ? mesParam : meses[meses.length - 1];
   const movimientosMes = movimientosPorMes[mes] ?? [];
 
   // ── Datos del mes seleccionado ───────────────────────────────
