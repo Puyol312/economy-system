@@ -4,6 +4,7 @@ import { calcularBalancePorDia, obtenerTotalesPorDia } from "./calculations/dail
 import { agruparPorConcepto } from "./calculations/concepts";
 
 import { agruparMovimientosPorMes, calcularSaldoAcumulado } from "./calculations/monthly";
+import { calcularVariacion } from "./calculations/variacion";
 
 export const generarReporteMensual = (
   movimientos: Movimiento[],
@@ -17,8 +18,10 @@ export const generarReporteMensual = (
     return null;
   }
 
-  const mes =
-    mesParam && movimientosPorMes[mesParam] ? mesParam : meses[meses.length - 1];
+  // `meses` está ordenado ascendente ("YYYY-MM"), así que el último
+  // elemento es el mes más reciente. Si no se pide un mes puntual,
+  // se carga ese por defecto.
+  const mes = mesParam && movimientosPorMes[mesParam] ? mesParam : meses[meses.length - 1];
   const movimientosMes = movimientosPorMes[mes] ?? [];
 
   // ── Datos del mes seleccionado ───────────────────────────────
@@ -85,12 +88,4 @@ export const generarReporteMensual = (
       variacionBalance,
     },
   };
-};
-
-const calcularVariacion = (anterior: number, actual: number): number | null => {
-  if (anterior === 0) {
-    return actual === 0 ? 0 : null;
-  }
-
-  return ((actual - anterior) / Math.abs(anterior)) * 100;
 };

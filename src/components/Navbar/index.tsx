@@ -20,6 +20,7 @@ export default function Navbar() {
     { href: "/datos", label: "Datos" },
     { href: "/mensual", label: "Mensual" },
     { href: "/anual", label: "Anual" },
+    { href: "/comparar", label: "Comparar" },
   ];
 
   return (

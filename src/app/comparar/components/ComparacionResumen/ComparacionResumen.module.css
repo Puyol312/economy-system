@@ -1,0 +1,75 @@
+.wrapper {
+  background: var(--background);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.header,
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 90px;
+  align-items: center;
+  gap: 12px;
+}
+
+.header {
+  padding-bottom: 10px;
+  border-bottom: 0.5px solid var(--border);
+  margin-bottom: 6px;
+}
+
+.headerLabel {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.headerMes {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.fila {
+  padding: 8px 0;
+}
+
+.filaLabel {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.filaValor {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.credito {
+  color: #1d9e75;
+}
+
+.debito {
+  color: #d85a30;
+}
+
+.balance {
+  color: var(--text-primary);
+}
+
+.variacion {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-align: right;
+}
+
+.favorable {
+  color: #1d9e75;
+}
+
+.desfavorable {
+  color: #d85a30;
+}
