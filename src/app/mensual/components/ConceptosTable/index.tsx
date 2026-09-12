@@ -1,12 +1,9 @@
 import { useState } from "react";
-import type { Movimiento } from "@/types";
+import type { Movimiento, TipoMovimiento } from "@/types";
 import ConceptoModal from "../ConceptoModal";
 import styles from "./ConceptosTable.module.css";
 import { formatearMoneda } from "@/lib/format";
 
-/**
- * ConceptosTableProps
- */
 export interface ConceptosTableProps {
   /**
    * Créditos agrupados por concepto, ordenados de mayor a menor.
@@ -21,36 +18,43 @@ export interface ConceptosTableProps {
    * @example [["Alquiler", 18000], ["Supermercado", 8000]]
    */
   debitos: [string, number][];
-  /**
-   * Movimientos del mes seleccionado, sin agrupar.
-   * Proviene de `movimientosPorMes[mes]`.
-   * @example [
-   *   { id: 1, fecha: "2024-06-01", tipo: "credito", concepto: "Sueldo", monto: 50000 },
-   *   { id: 2, fecha: "2024-06-05", tipo: "debito", concepto: "Alquiler", monto: 18000 },
-   * ]
-   */
+
+  /** Movimientos del mes seleccionado, sin agrupar. */
   movimientosMes: Movimiento[];
+
+  /** Devuelve si un concepto está excluido de los totales mostrados. */
+  estaExcluido: (concepto: string, tipo: TipoMovimiento) => boolean;
+
+  /** Tilda/destilda un concepto de los totales mostrados en pantalla. */
+  onToggleConcepto: (concepto: string, tipo: TipoMovimiento) => void;
 }
 
 /**
  * TablaConceptos
  *
  * Tabla individual de conceptos para un tipo de movimiento.
- * Muestra título, encabezados y filas con numeración.
- * Si no hay datos muestra un mensaje vacío.
+ * Cada fila tiene un checkbox: destildarlo excluye ese concepto
+ * de los totales, gráficos y balance mostrados en la página
+ * (sin borrar ni modificar los datos originales).
  */
 function TablaConceptos({
   titulo,
   datos,
+  tipo,
   colorClass,
   emptyMessage,
   onConceptoClick,
+  estaExcluido,
+  onToggleConcepto,
 }: {
   titulo: string;
   datos: [string, number][];
+  tipo: TipoMovimiento;
   colorClass: string;
   emptyMessage: string;
   onConceptoClick: (concepto: string) => void;
+  estaExcluido: (concepto: string, tipo: TipoMovimiento) => boolean;
+  onToggleConcepto: (concepto: string, tipo: TipoMovimiento) => void;
 }) {
   return (
     <div className={styles.tableWrapper}>
@@ -58,6 +62,7 @@ function TablaConceptos({
       <table className={styles.table}>
         <thead>
           <tr className={styles.theadRow}>
+            <th className={styles.thCheckbox} />
             <th className={styles.thNum}>#</th>
             <th className={styles.thConcepto}>Concepto</th>
             <th className={styles.thMonto}>Monto</th>
@@ -66,24 +71,43 @@ function TablaConceptos({
         <tbody>
           {datos.length === 0 ? (
             <tr>
-              <td colSpan={3} className={styles.empty}>
+              <td colSpan={4} className={styles.empty}>
                 {emptyMessage}
               </td>
             </tr>
           ) : (
-            datos.map(([concepto, monto], i) => (
-              <tr
-                key={concepto}
-                className={`${styles.row} ${styles.rowClickable}`}
-                onClick={() => onConceptoClick(concepto)}
-              >
-                <td className={styles.tdNum}>{i + 1}</td>
-                <td className={styles.tdConcepto}>{concepto}</td>
-                <td className={`${styles.tdMonto} ${colorClass}`}>
-                  {formatearMoneda(monto)}
-                </td>
-              </tr>
-            ))
+            datos.map(([concepto, monto], i) => {
+              const excluido = estaExcluido(concepto, tipo);
+              return (
+                <tr
+                  key={concepto}
+                  className={`${styles.row} ${styles.rowClickable} ${
+                    excluido ? styles.rowExcluida : ""
+                  }`}
+                  onClick={() => onConceptoClick(concepto)}
+                >
+                  <td className={styles.tdCheckbox}>
+                    <input
+                      type="checkbox"
+                      className={styles.checkbox}
+                      checked={!excluido}
+                      onClick={(e) => e.stopPropagation()}
+                      onChange={() => onToggleConcepto(concepto, tipo)}
+                      aria-label={
+                        excluido
+                          ? `Incluir "${concepto}" en los totales`
+                          : `Excluir "${concepto}" de los totales`
+                      }
+                    />
+                  </td>
+                  <td className={styles.tdNum}>{i + 1}</td>
+                  <td className={styles.tdConcepto}>{concepto}</td>
+                  <td className={`${styles.tdMonto} ${colorClass}`}>
+                    {formatearMoneda(monto)}
+                  </td>
+                </tr>
+              );
+            })
           )}
         </tbody>
       </table>
@@ -97,22 +121,17 @@ function TablaConceptos({
  * Tabla doble que muestra los conceptos de créditos y débitos
  * del mes seleccionado, ordenados de mayor a menor monto.
  *
- * Cada tabla es independiente: si una no tiene datos muestra
- * su propio mensaje vacío sin afectar a la otra.
- *
- * @example
- * ```tsx
- * // app/mensual/page.tsx
- * const creditos = agruparPorConcepto(movimientosMes, "credito");
- * const debitos  = agruparPorConcepto(movimientosMes, "debito");
- *
- * <ConceptosTable creditos={creditos} debitos={debitos} />
- * ```
+ * Cada fila tiene un checkbox para excluirla de los totales
+ * mostrados en pantalla (total créditos, total débitos, balance
+ * del mes y los gráficos). El concepto no desaparece de la tabla,
+ * solo se atenúa — así es fácil volver a incluirlo.
  */
 export default function ConceptosTable({
   creditos,
   debitos,
   movimientosMes,
+  estaExcluido,
+  onToggleConcepto,
 }: ConceptosTableProps) {
   const [conceptoSeleccionado, setConceptoSeleccionado] = useState<string | null>(null);
   return (
@@ -123,9 +142,12 @@ export default function ConceptosTable({
         <TablaConceptos
           titulo="Créditos"
           datos={creditos}
+          tipo="credito"
           colorClass={styles.credito}
           emptyMessage="Sin créditos este mes"
           onConceptoClick={setConceptoSeleccionado}
+          estaExcluido={estaExcluido}
+          onToggleConcepto={onToggleConcepto}
         />
 
         <div className={styles.divider} />
@@ -133,9 +155,12 @@ export default function ConceptosTable({
         <TablaConceptos
           titulo="Débitos"
           datos={debitos}
+          tipo="debito"
           colorClass={styles.debito}
           emptyMessage="Sin débitos este mes"
           onConceptoClick={setConceptoSeleccionado}
+          estaExcluido={estaExcluido}
+          onToggleConcepto={onToggleConcepto}
         />
       </div>
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMonthlyReport } from "@/hooks/useMonthlyReport";
+import { useFiltroConceptos } from "@/hooks/useFiltroConceptos";
 
 import PageHeader from "@/components/PageHeader";
 import EmptyState from "@/components/EmptyState";
@@ -16,6 +17,8 @@ import styles from "./page.module.css";
 export default function MensualPage() {
   const { reporte, mesActivo, setMesActivo, isLoading, error, hasData } =
     useMonthlyReport();
+
+  const filtro = useFiltroConceptos(reporte?.movimientosMes ?? []);
 
   if (!hasData) {
     return (
@@ -75,25 +78,42 @@ export default function MensualPage() {
           onMesChange={setMesActivo}
         />
         <div className={styles.content}>
+          {filtro.hayExclusiones && (
+            <div className={styles.avisoFiltro} role="status">
+              <span>
+                {filtro.totalExcluidos} concepto{filtro.totalExcluidos !== 1 ? "s" : ""}{" "}
+                excluido{filtro.totalExcluidos !== 1 ? "s" : ""} de los totales y gráficos
+                mostrados.
+              </span>
+              <button
+                className={styles.avisoFiltroBoton}
+                onClick={filtro.limpiarExclusiones}
+              >
+                Mostrar todo
+              </button>
+            </div>
+          )}
           <div className={styles.chartsGrid}>
             <div className={styles.chartMain}>
-              <BalanceDiarioChart balancePorDia={reporte.balancePorDia} />
+              <BalanceDiarioChart balancePorDia={filtro.balancePorDia} />
             </div>
             <div className={styles.chartSide}>
-              <TotalesPorDiaChart totalesPorDia={reporte.creditosPorDia} tipo="credito" />
-              <TotalesPorDiaChart totalesPorDia={reporte.debitosPorDia} tipo="debito" />
+              <TotalesPorDiaChart totalesPorDia={filtro.creditosPorDia} tipo="credito" />
+              <TotalesPorDiaChart totalesPorDia={filtro.debitosPorDia} tipo="debito" />
             </div>
           </div>
           <ResumenMensual
-            totalCreditos={reporte.totalCreditos}
-            totalDebitos={reporte.totalDebitos}
-            balanceMes={reporte.balanceMes}
+            totalCreditos={filtro.totalCreditos}
+            totalDebitos={filtro.totalDebitos}
+            balanceMes={filtro.balanceMes}
             saldoAlCierre={reporte.saldoAlCierre}
           />
           <ConceptosTable
             creditos={reporte.creditos}
             debitos={reporte.debitos}
             movimientosMes={reporte.movimientosMes}
+            estaExcluido={filtro.estaExcluido}
+            onToggleConcepto={filtro.toggleConcepto}
           />
         </div>
       </div>
